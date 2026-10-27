@@ -1,28 +1,46 @@
 # atom-crm-web
 
-[简体中文](README.md)
+An open-source CRM web frontend for [atom-crm](https://github.com/Archetom/atom-crm), built with React, TypeScript, and Ant Design for desktop and mobile.
 
-The responsive React web application for the `atom-crm` backend. The two repositories build and deploy independently, and share a versioned OpenAPI contract. The frontend uses React Router Framework Mode, strict TypeScript, Ant Design, and TanStack Query.
+[简体中文](README.md) · [Quick start](#quick-start) · [Documentation](#documentation) · [Backend](https://github.com/Archetom/atom-crm)
 
-Repositories: [Archetom/atom-crm-web](https://github.com/Archetom/atom-crm-web) for this frontend and [Archetom/atom-crm](https://github.com/Archetom/atom-crm) for the backend.
+## Features
 
-## Run locally
+- **Customers and sales**: customers, contacts, leads, opportunities, products, and shared pools.
+- **Contracts and payments**: contracts, invoices, receivables, payment plans, and billing profiles.
+- **Team collaboration**: activity records, tasks, approvals, announcements, and notifications.
+- **Analytics and administration**: worklists, reports, dashboards, organization members, roles, and field settings.
+- **Responsive interface**: desktop and mobile layouts, with navigation and actions driven by server authorization.
 
-Use Node.js 24.12.0 and pnpm 11.9.0, matching `.node-version`, `package.json`, and CI. Start the matching `atom-crm` backend and MySQL following its README. The default API address is `http://localhost:8080`.
+The frontend and backend build and deploy independently, sharing an OpenAPI contract. Dependency installation, unit tests, and builds can run without the backend; using the application requires a matching backend.
+
+## Quick start
+
+### Requirements
+
+- Node.js 24.12.0, as specified in [`.node-version`](.node-version)
+- pnpm 11.9.0, matching [`package.json`](package.json)
+- MySQL and the backend running as described in the [backend README](https://github.com/Archetom/atom-crm/blob/main/README.en.md#quick-start)
+
+### Start the frontend
 
 ```bash
+git clone https://github.com/Archetom/atom-crm-web.git
+cd atom-crm-web
 cp .env.example .env
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open the frontend address printed by the development server. Visit `/setup` to create the first workspace administrator, or `/login` for an existing installation. There are no default credentials. Normal password login does not require development identity headers.
+Open the address printed by the development server. API requests are proxied to `http://localhost:8080` by default; set `VITE_API_PROXY_TARGET` in `.env` to change it. The OpenAPI snapshot and generated types are included, so no contract refresh is needed on first run.
 
-The OpenAPI snapshot and generated types are committed, so an initial checkout does not require a running backend to install, test, or build. Refresh the snapshot only when changing the backend contract, following the [OpenAPI instructions](openapi/README.md). The running application still needs the backend.
+### First installation
 
-For isolated local testing only, `VITE_ENABLE_DEV_AUTH=true pnpm dev` enables `/dev/session` against a backend that explicitly enables trusted headers in `dev` or `test`. Never enable this for production.
+Visit `/setup` to create the first workspace administrator, then use `/login` for subsequent sign-ins. There are no default credentials, and normal use does not require development identity headers.
 
-## Verify
+These steps are for local development. See the [deployment guide](docs/deployment.md) for production containers, HTTPS, same-origin proxying, and local development identity setup.
+
+## Development and testing
 
 ```bash
 pnpm format:check
@@ -33,14 +51,26 @@ pnpm build
 pnpm bundle:check
 ```
 
-CI also checks API generation, production dependency advisories, and the backend-independent accessibility specification. Full business E2E tests require an isolated backend and seed data; they are not currently part of CI. See [deployment and E2E instructions](docs/deployment.md).
+`pnpm test:e2e:a11y` runs browser accessibility checks without a backend. Full business E2E tests require an isolated backend and seed data, and are not currently part of CI. See the [deployment and testing instructions](docs/deployment.md), and follow the [OpenAPI guide](openapi/README.md) when changing the API contract.
 
-## Deploy and contribute
+## Documentation
 
-The multi-stage Dockerfile serves the static application through Nginx. Set `ATOM_CRM_API_UPSTREAM` to the authenticated backend and provide HTTPS at the deployment boundary. Keep credentials out of `VITE_*` variables and the browser bundle. See [deployment](docs/deployment.md) for cookie authentication, reverse proxy, and file-upload requirements.
+| Guide                                        | Topics                                                       |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| [Deployment](docs/deployment.md)             | Local integration, production setup, and E2E tests           |
+| [Architecture](docs/architecture.md)         | Project structure, technology choices, and data flow         |
+| [OpenAPI](openapi/README.md)                 | Contract snapshots, type generation, and API synchronization |
+| [API coverage](docs/api-coverage.md)         | Endpoint coverage across frontend features                   |
+| [Navigation](docs/navigation.md)             | Menus, routes, and page boundaries                           |
+| [Feature history](docs/functional-parity.md) | Delivered functionality and change records                   |
+| [Security](docs/security.md)                 | Authentication, authorization, and sensitive data handling   |
 
-Read the [contribution guide](CONTRIBUTING.md) before submitting changes. Use repository Issues for ordinary questions and feature requests, and the [security policy](SECURITY.md) for vulnerabilities. Most detailed product and engineering documentation is currently in Chinese.
+Detailed guides are currently in Chinese.
+
+## Contributing
+
+Issues and pull requests are welcome. Read the [contributing guide](CONTRIBUTING.md) before getting started. Report vulnerabilities privately through the process in [SECURITY.md](SECURITY.md).
 
 ## License
 
-[MIT](LICENSE). `private: true` in `package.json` prevents accidental npm publication; it does not restrict the source license. Third-party dependencies retain their own licenses.
+[MIT](LICENSE)
