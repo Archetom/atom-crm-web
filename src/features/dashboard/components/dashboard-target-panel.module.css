@@ -1,0 +1,45 @@
+.titleBar {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.targetManagementLink {
+  color: var(--app-focus);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.targetManagementLink:hover {
+  color: color-mix(in srgb, var(--app-focus) 82%, black);
+}
+
+.period {
+  margin-block-end: 16px;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.figures :global(.ant-statistic-title) {
+  color: var(--app-text-secondary);
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block: 20px 8px;
+}
+
+@media (width <= 520px) {
+  .figures {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}

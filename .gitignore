@@ -1,0 +1,18 @@
+node_modules/
+.pnpm-store/
+.react-router/
+build/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+openapi/*.tmp
+
+# Local editor, agent, and operating-system files
+.DS_Store
+*.log
+.idea/
+.vscode/
+/AGENTS.local.md

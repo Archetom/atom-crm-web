@@ -1,0 +1,12 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+}
+
+.contractPickerControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

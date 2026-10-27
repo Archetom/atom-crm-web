@@ -1,0 +1,52 @@
+.root {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 12px;
+}
+
+.copy {
+  min-width: 0;
+}
+
+.title {
+  margin-block: 0 2px !important;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.moreActions {
+  display: none;
+  width: 40px;
+  height: 40px;
+}
+
+@media (width <= 767px) {
+  .root {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-block-end: 16px;
+  }
+
+  .actions {
+    justify-content: space-between;
+  }
+
+  .secondaryActions {
+    display: none;
+  }
+
+  .moreActions {
+    display: inline-flex;
+  }
+}

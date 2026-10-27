@@ -1,0 +1,28 @@
+.root :global(.ant-drawer-header) {
+  min-height: 52px;
+  padding: 14px 20px;
+  border-bottom-color: var(--app-border-subtle);
+}
+
+.root :global(.ant-drawer-body) {
+  padding: 20px 24px 28px;
+  background: #ffffff;
+}
+
+.drawer :global(.ant-typography h1),
+.drawer :global(h1.ant-typography) {
+  margin-block: 4px 0 !important;
+  font-size: 24px !important;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+@media (width <= 767px) {
+  .root :global(.ant-drawer-content-wrapper) {
+    width: min(100vw, 960px) !important;
+  }
+
+  .root :global(.ant-drawer-body) {
+    padding: 16px;
+  }
+}

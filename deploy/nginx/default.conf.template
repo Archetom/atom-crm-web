@@ -1,0 +1,56 @@
+server {
+  listen 8080;
+  server_name _;
+  root /usr/share/nginx/html;
+
+  server_tokens off;
+
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header X-Frame-Options "SAMEORIGIN" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
+  # Nearby customer and lead pages explicitly request browser geolocation.
+  add_header Permissions-Policy "geolocation=(self)" always;
+
+  location = /index.html {
+    add_header Cache-Control "no-store" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
+    add_header Permissions-Policy "geolocation=(self)" always;
+    try_files /index.html =404;
+  }
+
+  location /assets/ {
+    # Only cache a successfully resolved fingerprinted asset. A transient 404
+    # must not become immutable in a browser cache during a rolling deploy.
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
+    add_header Permissions-Policy "geolocation=(self)" always;
+    try_files $uri =404;
+  }
+
+  # Production authentication belongs to the upstream identity adapter or
+  # gateway. Deliberately strip development-only identity headers here.
+  location /api/ {
+    proxy_pass ${ATOM_CRM_API_UPSTREAM};
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Dev-User-Id "";
+    proxy_set_header X-Dev-Tenant-Id "";
+    proxy_connect_timeout 5s;
+    proxy_read_timeout 60s;
+    proxy_send_timeout 60s;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}

@@ -1,0 +1,241 @@
+.shell {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.inner {
+  min-width: 0;
+  background: #ffffff;
+}
+
+.header {
+  display: flex;
+  height: 56px;
+  min-height: 56px;
+  align-items: stretch;
+  gap: 18px;
+  padding-inline: 16px;
+  border-bottom: 1px solid var(--app-border-subtle);
+  background: #ffffff;
+  line-height: normal;
+}
+
+.brand,
+.headerLeading,
+.headerActions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.brand {
+  flex: none;
+  gap: 8px;
+  color: var(--app-text);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.brandMark {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 3px;
+  background: #2668d9;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.applicationName {
+  color: var(--app-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.applicationEntry,
+.menuButton,
+.headerIconButton {
+  width: 32px;
+  height: 32px;
+  color: #455065;
+}
+
+.menuButton {
+  display: none;
+}
+
+.topNavigation {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.moduleNavigation {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  border-bottom: 0 !important;
+  background: transparent !important;
+}
+
+.moduleNavigation :global(.ant-menu-overflow) {
+  height: 56px;
+  align-items: stretch;
+}
+
+.moduleNavigation :global(.ant-menu-item),
+.moduleNavigation :global(.ant-menu-submenu) {
+  display: flex;
+  height: 56px;
+  align-items: center;
+  margin-inline: 0 !important;
+  padding-inline: 12px !important;
+  color: #344054;
+  font-size: 14px;
+}
+
+.moduleNavigation :global(.ant-menu-item::after),
+.moduleNavigation :global(.ant-menu-submenu::after) {
+  inset-inline: 12px !important;
+  bottom: 0 !important;
+  border-bottom-width: 2px !important;
+}
+
+.headerActions {
+  flex: none;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+
+.headerActions :global(.ant-tag) {
+  margin-inline: 6px 2px;
+}
+
+.globalCreate {
+  margin-inline: 4px 6px;
+}
+
+.tenantSwitcher {
+  max-width: 156px;
+  color: var(--app-text-secondary);
+}
+
+.tenantSwitcher :global(.ant-btn-icon) {
+  color: currentColor;
+}
+
+.headerMeta {
+  max-width: 116px;
+  overflow: hidden;
+  color: var(--app-text-secondary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberAvatar {
+  background: #dce8ff;
+  color: #1d4ea6;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.contextRail {
+  width: 240px !important;
+  flex: 0 0 240px !important;
+  border-inline-end: 1px solid var(--app-border-subtle);
+  background: #f5f6f8 !important;
+}
+
+.contextTitle {
+  display: block;
+  padding: 22px 20px 12px;
+  color: #172033;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.contextNavigation {
+  padding: 0 10px;
+  border-inline-end: 0 !important;
+  background: transparent !important;
+}
+
+.contextNavigation :global(.ant-menu-item) {
+  height: 38px;
+  margin-block: 2px !important;
+  padding-inline: 12px !important;
+  border-radius: 3px !important;
+  font-size: 14px;
+  line-height: 38px;
+}
+
+.content {
+  min-width: 0;
+  padding: 18px 24px 24px;
+  background: #ffffff;
+}
+
+.contentMain {
+  width: 100%;
+  min-width: 0;
+}
+
+.drawer :global(.ant-drawer-body) {
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  background: #f5f6f8;
+}
+
+.drawer :global(.ant-drawer-header) {
+  padding-top: calc(16px + env(safe-area-inset-top));
+  background: #ffffff;
+}
+
+.mobileNavigation {
+  border-inline-end: 0 !important;
+  background: transparent !important;
+}
+
+@media (width <= 1100px) {
+  .moduleNavigation :global(.ant-menu-item),
+  .moduleNavigation :global(.ant-menu-submenu) {
+    padding-inline: 8px !important;
+  }
+
+  .moduleNavigation :global(.ant-menu-item::after),
+  .moduleNavigation :global(.ant-menu-submenu::after) {
+    inset-inline: 8px !important;
+  }
+
+  .headerMeta {
+    display: none;
+  }
+}
+
+@media (width <= 767px) {
+  .header {
+    gap: 8px;
+    padding-inline: 10px;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .topNavigation,
+  .contextRail,
+  .applicationName,
+  .tenantSwitcher,
+  .headerActions :global(.ant-tag) {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .content {
+    padding: 14px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+}

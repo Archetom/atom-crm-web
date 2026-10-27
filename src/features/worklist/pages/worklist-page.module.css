@@ -1,0 +1,39 @@
+.page {
+  display: grid;
+  gap: 16px;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heading :global(.ant-typography) {
+  margin-block: 0;
+}
+
+.dateActions {
+  flex: none;
+}
+
+.listCard :global(.ant-card-body) {
+  padding-block: 12px;
+}
+
+.categoryActions {
+  padding: 0 12px 12px;
+}
+
+.loadMore {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 4px;
+}
+
+@media (width <= 767px) {
+  .heading {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,42 @@
+.scope {
+  margin-block-end: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.bucket {
+  display: grid;
+  min-block-size: 92px;
+  align-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--app-border-subtle) 30%, transparent);
+}
+
+.bucket dt {
+  color: var(--app-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.bucket dd {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1;
+}
+
+@media (width <= 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

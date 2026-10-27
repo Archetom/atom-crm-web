@@ -1,0 +1,50 @@
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.actions {
+  display: flex;
+  margin-block-start: 16px;
+}
+
+.titleRow {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.description {
+  white-space: pre-wrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detailTabs {
+  margin-block-end: -4px;
+}
+
+.detailTabs :global(.ant-tabs-nav) {
+  margin-block-end: 8px;
+}
+
+.detailTabs :global(.ant-tabs-tab) {
+  padding-block: 8px;
+}
+
+@media (width <= 767px) {
+  .heading {
+    flex-direction: column;
+  }
+
+  .actions {
+    display: flex;
+  }
+}

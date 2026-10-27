@@ -1,0 +1,36 @@
+services:
+  mysql:
+    image: mysql:9.7.1
+    environment:
+      MYSQL_DATABASE: atom_e2e
+      MYSQL_USER: atom_e2e
+      MYSQL_PASSWORD: atom_e2e
+      MYSQL_ROOT_PASSWORD: root_e2e
+    ports:
+      - "127.0.0.1:13306:3306"
+    volumes:
+      - mysql_e2e_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot_e2e"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  atom-crm:
+    image: ${ATOM_CRM_IMAGE:?Set ATOM_CRM_IMAGE to a reviewed atom-crm development image}
+    profiles: ["api"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_ADDRESS: "0.0.0.0"
+      ATOM_SECURITY_TRUSTED_HEADER_ENABLED: "true"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/atom_e2e?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: atom_e2e
+      SPRING_DATASOURCE_PASSWORD: atom_e2e
+    ports:
+      - "127.0.0.1:18080:8080"
+
+volumes:
+  mysql_e2e_data:

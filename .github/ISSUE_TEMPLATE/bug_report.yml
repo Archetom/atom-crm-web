@@ -1,0 +1,38 @@
+name: 缺陷报告 / Bug report
+description: 报告可复现的前端问题；安全漏洞请先阅读 SECURITY.md。
+body:
+  - type: markdown
+    attributes:
+      value: 请勿提交凭据、客户数据或安全漏洞细节；漏洞请使用 SECURITY.md 中的私密报告流程。
+  - type: input
+    id: versions
+    attributes:
+      label: 前端与后端版本 / Frontend and backend versions
+      description: 提供两个仓库的提交号或版本号。
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 运行环境 / Environment
+      description: 浏览器及版本、操作系统、Node.js 与 pnpm 版本、开发或生产部署方式。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 使用虚构数据描述最小复现步骤。
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 预期与实际行为 / Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 脱敏证据 / Sanitized evidence
+      description: 可选截图、稳定错误码和相关测试结果；不要粘贴 Cookie、请求头或完整请求体。

@@ -1,0 +1,27 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.pipelineDescription {
+  margin-bottom: 16px;
+}
+
+.stageError {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

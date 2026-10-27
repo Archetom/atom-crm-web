@@ -1,0 +1,16 @@
+.page {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 24px;
+}
+
+.heading {
+  display: grid;
+  gap: 8px;
+}
+
+.taskList {
+  margin-top: 8px;
+}

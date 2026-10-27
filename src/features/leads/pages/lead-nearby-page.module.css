@@ -1,0 +1,46 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.toolbar {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.controls {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.radius {
+  min-width: 160px;
+}
+
+.mobileCard {
+  width: 100%;
+}
+
+.mobileMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (width <= 767px) {
+  .toolbar,
+  .controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .radius {
+    width: 100%;
+  }
+}

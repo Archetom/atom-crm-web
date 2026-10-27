@@ -1,0 +1,121 @@
+:root {
+  --app-bg: #f5f6f8;
+  --app-surface: #ffffff;
+  --app-border: #dfe3ea;
+  --app-border-subtle: #edf0f4;
+  --app-text: #172033;
+  --app-text-secondary: #5f6878;
+  --app-focus: #2668d9;
+  color: var(--app-text);
+  background: var(--app-bg);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--app-bg);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: #dbe9ff;
+  color: #172033;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1100;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  padding: 8px 12px;
+  border-radius: 3px;
+  background: #172033;
+  color: #ffffff;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 120ms ease-out;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.ant-tag.ant-tag-green.ant-tag-filled:not(.ant-tag-disabled) {
+  color: #237804;
+}
+
+.ant-input-password-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: CanvasText;
+  }
+}
+
+/**
+ * Ant Design has no built-in reduced-motion handling, so the shell provides the
+ * fallback for every animated surface (modals, drawers, dropdowns, skeletons) rather
+ * than relying on each component to opt in.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.session-page {
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+  place-items: center;
+  background: var(--app-bg);
+}
+
+.session-card {
+  width: min(100%, 480px);
+}
+
+@media (width <= 767px) {
+  .ant-input,
+  .ant-input-affix-wrapper input,
+  .ant-select-selection-search-input,
+  .ant-input-number-input,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .session-page {
+    padding: 16px;
+  }
+}

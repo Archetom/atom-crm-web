@@ -1,0 +1,112 @@
+.desktop {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: 3px;
+  background: var(--app-surface);
+}
+
+.desktop :global(.ant-table) {
+  background: transparent;
+}
+
+.desktop :global(.ant-table-thead > tr > th) {
+  height: 40px;
+  padding-block: 9px !important;
+  border-bottom-color: var(--app-border) !important;
+  background: #f7f8fa !important;
+  color: #4f5b70;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.desktop :global(.ant-table-tbody > tr > td) {
+  height: 44px;
+  padding-block: 9px !important;
+  border-bottom-color: var(--app-border-subtle);
+}
+
+.desktop :global(.ant-table-tbody > tr:hover > td),
+.desktop :global(.ant-table-tbody > tr:hover > .ant-table-cell-fix-left),
+.desktop :global(.ant-table-tbody > tr:hover > .ant-table-cell-fix-right) {
+  background: #f7faff !important;
+}
+
+.desktop :global(.ant-table-cell-fix-left),
+.desktop :global(.ant-table-cell-fix-right) {
+  background: var(--app-surface);
+}
+
+.mobile {
+  display: none;
+}
+
+.mobileItems {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mobileItems > li {
+  min-width: 0;
+}
+
+.mobileItems :global(.ant-card-head-title) {
+  min-width: 0;
+  white-space: normal;
+}
+
+.mobileLoading {
+  display: grid;
+  min-height: 96px;
+  place-items: center;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid #b9d2ff;
+  border-radius: 8px;
+  background: #f0f6ff;
+}
+
+.pager {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.unknownTotalPager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (width <= 767px) {
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: block;
+  }
+
+  .bulkActions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pager,
+  .unknownTotalPager {
+    justify-content: center;
+  }
+}

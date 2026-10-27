@@ -1,0 +1,8 @@
+build/
+coverage/
+node_modules/
+docs/api-coverage.md
+openapi/atom-crm.json
+plan.md
+pnpm-lock.yaml
+src/api/generated/

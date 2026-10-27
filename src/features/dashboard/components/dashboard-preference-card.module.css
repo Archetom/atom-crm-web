@@ -1,0 +1,24 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-end: 16px;
+}
+
+.toolbarSelect {
+  width: 196px;
+}
+
+.toolbarFeedback {
+  margin-block: 0 16px;
+}
+
+@media (width <= 560px) {
+  .toolbar {
+    align-items: stretch;
+  }
+
+  .toolbarSelect {
+    width: 100%;
+  }
+}

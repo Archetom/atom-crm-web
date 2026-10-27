@@ -1,0 +1,58 @@
+.panel :global(.ant-card-body) {
+  padding: 16px;
+}
+
+.sections {
+  display: grid;
+  gap: 18px;
+}
+
+.section {
+  min-width: 0;
+}
+
+.sectionTitle {
+  display: block;
+  margin-block-end: 8px;
+  color: var(--app-text-secondary);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metric {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--app-border-subtle);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--app-border-subtle) 30%, transparent);
+}
+
+.metricHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 22px;
+}
+
+.metric :global(.ant-statistic-content) {
+  margin-block-start: 2px;
+  font-size: 20px;
+}
+
+.metric :global(.ant-tag) {
+  margin-inline-end: 0;
+  color: var(--app-text-secondary);
+  background: transparent;
+  border-color: var(--app-border);
+}
+
+@media (width <= 480px) {
+  .metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,31 @@
+.root,
+.content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: 20px;
+}
+
+.summary {
+  position: sticky;
+  top: 20px;
+  min-width: 0;
+}
+
+@media (width <= 1199px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .summary {
+    position: static;
+    order: -1;
+  }
+}

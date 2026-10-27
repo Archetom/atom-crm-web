@@ -1,0 +1,18 @@
+.mobileCard {
+  width: 100%;
+}
+
+.nameLink {
+  color: inherit;
+  font-weight: 600;
+}
+
+.nameLink:hover {
+  color: var(--ant-color-primary);
+}
+
+.mobileMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

@@ -1,0 +1,21 @@
+name: 功能建议 / Feature request
+description: 说明要解决的问题与期望的行为。
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题与使用场景 / Problem and use case
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望行为 / Proposed behavior
+      description: 说明用户操作、预期结果与可接受的替代方案。
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: 后端与权限影响 / Backend and authorization impact
+      description: 若已知，请说明需要的后端契约、数据范围与权限变化；不要包含真实客户数据。

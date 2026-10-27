@@ -1,0 +1,14 @@
+.git
+.github
+.agents
+.codex
+.env
+.env.*
+!.env.example
+node_modules
+.pnpm-store
+.react-router
+build
+coverage
+playwright-report
+test-results

@@ -1,0 +1,1325 @@
+{
+  "GET /api/v1/installation": {
+    "classification": "公开页面",
+    "surface": "首次安装页读取服务端唯一安装状态，决定是否显示管理员创建表单",
+    "phase": "P0",
+    "authority": "公开一次性安装状态；浏览器不提供或推断 tenant、actor、role、authority 或数据范围"
+  },
+  "POST /api/v1/installation/tenant-admin": {
+    "classification": "公开页面",
+    "surface": "首次安装页原子创建工作区 1 owner 管理员并接收 HttpOnly 浏览器会话",
+    "phase": "P0",
+    "authority": "公开的一次性后端原子仲裁；只接受用户明确输入的账号资料和密码，409 后关闭表单"
+  },
+  "GET /api/v1/organization/tenants": {
+    "phase": "P0",
+    "surface": "Read the current development identity's server-confirmed accessible tenant list before offering a tenant switch",
+    "authority": "development identity + organization:request UI guard; server returns only active memberships"
+  },
+  "GET /api/v1/organization/tenants/{targetTenantId}/access": {
+    "phase": "P0",
+    "surface": "Revalidate one selected development tenant before replacing the current-tab development session and reloading",
+    "authority": "development identity + organization:request UI guard; server rechecks active membership and does not switch production credentials"
+  },
+  "GET /api/v1/authorization/me": {
+    "phase": "P1",
+    "surface": "Get the caller's effective authorization snapshot, including tenant roles, data scopes, and verified authentication-context capabilities used by server navigation",
+    "authority": "Bootstrap gate; browser never supplies actor, tenant, role, authority, or data scope"
+  },
+  "GET /api/v1/organization/membership-requests/mine": {
+    "surface": "分页读取当前申请人自己的成员申请，并只允许对服务端回显的待审核记录撤回",
+    "authority": "`organization:request`；申请人仅从已验证 caller 派生，浏览器不枚举目标租户/部门"
+  },
+  "POST /api/v1/organization/membership-requests": {
+    "surface": "提交由邀请或管理员提供目标 ID 的成员申请",
+    "authority": "`organization:request`；不切换身份，不提供全局目标租户/部门目录"
+  },
+  "POST /api/v1/organization/membership-requests/{requestId}/withdraw": {
+    "surface": "撤回当前申请人自己的待审核成员申请",
+    "authority": "`organization:request`；服务端按 verified applicant 和状态复核"
+  },
+  "GET /api/v1/approval-definitions/{definitionId}": {
+    "phase": "P5",
+    "surface": "Read an approval definition's narrow status/version baseline before an explicit lifecycle action",
+    "authority": "approvals:manage UI guard + active membership; UI retains only matching ID, status, and version"
+  },
+  "PUT /api/v1/approval-definitions/{definitionId}": {
+    "phase": "P5",
+    "surface": "Replace only an inactive definition that matches the reviewed Web minimal-template baseline",
+    "authority": "approvals:manage + organization:read UI guards + matching minimal baseline version; complex or active definitions fail closed without a partial rewrite"
+  },
+  "POST /api/v1/approval-definitions": {
+    "phase": "P5",
+    "surface": "Create an inactive single-member-step approval-definition draft from server-visible member choices",
+    "authority": "approvals:manage + organization:read UI guards + active membership; UI submits only name, object type, reviewed ONCE/member-step routing, selected approvers, and selected fallback managers"
+  },
+  "POST /api/v1/approval-definitions/query": {
+    "phase": "P5",
+    "surface": "Page the service-authorized approval-definition catalog from the application-header modal",
+    "authority": "approvals:manage UI guard + active membership; UI retains only definition ID, name, object type, and status, and does not load routing, scopes, conditions, versions, or timestamps"
+  },
+  "PUT /api/v1/approval-definitions/{definitionId}/status": {
+    "phase": "P5",
+    "surface": "Explicitly activate, deactivate, or delete an approval definition from its narrow status/version baseline",
+    "authority": "approvals:manage UI guard + active membership + matching version; server rechecks definition references and activation constraints"
+  },
+  "POST /api/v1/approvals/query": {
+    "phase": "P5",
+    "surface": "Page the current member's pending approval inbox from the application-header modal",
+    "authority": "approvals:read UI guard + active membership + server-confirmed approval participation/management and current business-record visibility; UI sends only the PENDING bucket and consumes the returned version and allowedActions without inferring task ownership"
+  },
+  "GET /api/v1/approvals/{instanceId}": {
+    "phase": "P5",
+    "surface": "Read the selected pending approval's narrow status and task-timeline projection from the application-header modal",
+    "authority": "approvals:read UI guard + active membership + server-confirmed approval participation/management and current business-record visibility; UI consumes the returned version and allowedActions without retaining facts, business references, applicant, task ownership, remarks, or attachments"
+  },
+  "GET /api/v1/approvals/pending-count": {
+    "phase": "P5",
+    "surface": "Read the typed nonnegative pending count for the current caller; refresh policy remains a Web UI decision",
+    "authority": "approvals:read UI guard + active membership; count is server-scoped to the current caller's actionable approvals"
+  },
+  "POST /api/v1/approval-definitions/{definitionId}/preview": {
+    "phase": "P5",
+    "surface": "Preview a selected Customer, Receivable, or Return Visit approval route after record-bound approver choices",
+    "authority": "record detail route + approvals:submit UI guard + server-validated record visibility, definition, fields, and selected approvers; Web must not submit arbitrary facts or infer assignees"
+  },
+  "POST /api/v1/approvals": {
+    "phase": "P5",
+    "surface": "Submit a previewed Customer, Receivable, or Return Visit approval from a server-authorized start option",
+    "authority": "record detail route + approvals:submit UI guard + record start capability; Web sends only definitionId, subjectId, a browser-generated idempotencyKey, and allowed selectedApprovers"
+  },
+  "POST /api/v1/approvals/{instanceId}/actions": {
+    "phase": "P5",
+    "surface": "Execute APPROVE, REJECT, or TRANSFER only when the typed instance projection includes that allowed action",
+    "authority": "approvals:read UI guard + server-returned allowedActions and version; server rechecks task ownership, state, transfer target, and optimistic lock"
+  },
+  "POST /api/v1/approvals/{instanceId}/cancel": {
+    "phase": "P5",
+    "surface": "Cancel only when the typed instance projection includes CANCEL, returning ApprovalActionResult",
+    "authority": "server-returned CANCEL capability and version; browser must not infer manager status from local identity or a timeline"
+  },
+  "POST /api/v1/approvals/{instanceId}/withdraw": {
+    "phase": "P5",
+    "surface": "Withdraw only when the typed instance projection includes WITHDRAW, returning ApprovalActionResult",
+    "authority": "server-returned WITHDRAW capability and version; browser must not infer applicant status from local identity or a timeline"
+  },
+  "POST /api/v1/approvals/actions/batch": {
+    "phase": "P5",
+    "surface": "Apply typed approval actions atomically and consume per-item status, version, and stable errCode results",
+    "authority": "server-returned per-instance allowedActions and versions; browser must not retry partial or conflicting batches automatically"
+  },
+  "DELETE /api/v1/stage-workflows/records/{workflowRecordId}/comments/{commentId}": {
+    "phase": "P5",
+    "surface": "Deprecated typed alias for deleting a stage comment; use /stage-workflow-records/{workflowRecordId}/comments/{commentId}",
+    "authority": "Deprecated route; Web uses the canonical route and only the server-returned canDelete capability"
+  },
+  "GET /api/v1/stage-workflow-records/{workflowRecordId}/stages/{stageCode}/file-fields/{fieldCode}/{fileId}/content": {
+    "phase": "P5",
+    "surface": "Download a file only from the current typed stage-workflow record projection",
+    "authority": "workflows:read + server-confirmed record and file-field visibility; browser uses authenticated fetch and never guesses file IDs"
+  },
+  "GET /api/v1/attachment-targets/{targetType}/{targetId}/file-fields/{fieldCode}/{fileId}/content": {
+    "phase": "P3",
+    "surface": "Download a customer, product, or return-visit FILE attachment only when its field code and file metadata are present in the current detail projection",
+    "authority": "resource read + files:read UI guards; browser uses only server-issued fieldCode/fileId with authenticated fetch, while the server rechecks field visibility and target access"
+  },
+  "POST /api/v1/attachment-targets/{targetType}/{targetId}/file-fields/{fieldCode}/upload-intents": {
+    "phase": "P3",
+    "surface": "Create a private target-bound FILE candidate before an existing product's explicit FILE field replacement",
+    "authority": "products:read/write + fields:read + files:read/write UI guards; server rechecks target visibility, current FILE field write policy, uploader, tenant, and upload constraints"
+  },
+  "GET /api/v1/oa/requests/{requestId}/file-fields/{fieldCode}/{fileId}/content": {
+    "phase": "P6",
+    "surface": "Download a FILE only from the current OA request detail's server-projected field and attachment metadata",
+    "authority": "oa-requests:read + files:read UI guards; browser uses authenticated fetch and only the current detail's fieldCode/fileId, while the server rechecks request visibility, field read access, and unmasked state"
+  },
+  "GET /api/v1/stage-workflows/{workflowId}": {
+    "phase": "P5",
+    "surface": "Read a public stage-workflow projection, or an explicit manager-only complete replacement/status baseline",
+    "authority": "workflows:read UI guard + active membership; manager cache is separate and only accepts a matching resource UPDATE/CHANGE_STATUS baseline with version"
+  },
+  "GET /api/v1/stage-workflows/applicable": {
+    "phase": "P5",
+    "surface": "List Customer workflows applicable to the current detail record before an explicit start",
+    "authority": "customer detail route + server-confirmed record visibility and canStart; browser must not infer applicability"
+  },
+  "GET /api/v1/stage-workflows/configuration-options": {
+    "phase": "P5",
+    "surface": "Read the server-scoped object, writable-field, and approval-definition catalog for workflow configuration",
+    "authority": "workflows:manage UI guard + server configuration scope; browser never enumerates object types or eligible fields locally"
+  },
+  "GET /api/v1/stage-workflows/configuration-options/candidates": {
+    "phase": "P5",
+    "surface": "Search the server-scoped MEMBER or DEPARTMENT candidates for workflow applicability",
+    "authority": "workflows:manage UI guard + typed candidateType; browser does not fall back to organization directories"
+  },
+  "GET /api/v1/file-field-drafts/{draftId}/fields/{fieldCode}/files/{fileId}/upload-status": {
+    "phase": "P2/P5",
+    "surface": "Get named staged FILE upload status for a private CRM create draft or a record-scoped P5 stage FILE",
+    "authority": "P2 files:write + field policy; only the same CUSTOMER draft and server-issued file ID can reach customer creation; P5 stays bound to the same workflow record/field draft"
+  },
+  "POST /api/v1/file-field-drafts/{draftId}/fields/{fieldCode}/upload-intents": {
+    "phase": "P2/P5",
+    "surface": "Create a named FILE upload instruction for a private CRM create draft or staged workflow field",
+    "authority": "P2 files:write + field policy; P5 only consumes the same record-field draft's typed intent URL, method, and headers"
+  },
+  "POST /api/v1/file-field-drafts": {
+    "phase": "P3",
+    "surface": "Create a one-shot private CUSTOMER FILE draft before customer creation",
+    "authority": "files:write + customers:write UI guards; server rechecks active membership, CUSTOMER write scope, current FILE field write access, and draft ownership"
+  },
+  "GET /api/v1/stage-workflow-records/{workflowRecordId}": {
+    "phase": "P5",
+    "surface": "Read a narrow server-authorized stage-workflow running-record summary",
+    "authority": "workflows:read UI guard + server-confirmed running-record visibility; Web retains only status, current-stage names/tasks, and the approval-gate marker"
+  },
+  "GET /api/v1/stage-workflow-records/{workflowRecordId}/comments": {
+    "phase": "P5",
+    "surface": "Read the current running record's narrow stage-workflow comment page",
+    "authority": "workflows:read UI guard + server-confirmed record visibility; Web retains no author data and does not infer comment membership"
+  },
+  "GET /api/v1/stage-workflow-records/{workflowRecordId}/advance-options/{selectionCode}/candidates": {
+    "phase": "P5",
+    "surface": "Page server-validated approver candidates for one current stage advance selection",
+    "authority": "workflows:read UI guard + current record's ADVANCE capability and server-issued selection code; browser does not fall back to a member directory"
+  },
+  "POST /api/v1/stage-workflow-records/{workflowRecordId}/comments": {
+    "phase": "P5",
+    "surface": "Add a comment only while the matching running-record projection carries COMMENT",
+    "authority": "workflows:read UI guard + current record's server-returned COMMENT capability; server rechecks record visibility, state, and mutation eligibility"
+  },
+  "PUT /api/v1/stage-workflow-records/{workflowRecordId}/advance": {
+    "phase": "P5",
+    "surface": "Advance a same-record server-confirmed stage with supported basic/candidate/address values, confirmed FILE IDs, current task completions, and optional approver selections",
+    "authority": "workflows:read UI guard + current ADVANCE capability and version; Web accepts only complete unmasked baselines, current task codes, record-scoped candidates, structured address parts, and one same-record FILE draft with UPLOADED IDs"
+  },
+  "PUT /api/v1/stage-workflow-records/{workflowRecordId}/outcome": {
+    "phase": "P5",
+    "surface": "Finish a workflow record with a server-advertised failed outcome",
+    "authority": "workflows:read UI guard + current FAIL capability, version, and allowedOutcomes; browser only sends the selected advertised code and its bounded remark"
+  },
+  "DELETE /api/v1/stage-workflow-records/{workflowRecordId}/comments/{commentId}": {
+    "phase": "P5",
+    "surface": "Delete a stage-workflow comment with its server-issued version",
+    "authority": "workflows:read UI guard + that comment's server-returned canDelete and version; browser never infers authorship"
+  },
+  "GET /api/v1/stage-workflows/records/{workflowRecordId}": {
+    "phase": "P5",
+    "surface": "Deprecated typed alias for a running-record baseline; use /stage-workflow-records/{workflowRecordId}",
+    "authority": "Deprecated route; Web uses the canonical record and server-returned allowedActions, writableFieldCodes, and allowedTaskCodes"
+  },
+  "GET /api/v1/stage-workflows/records/{workflowRecordId}/comments": {
+    "phase": "P5",
+    "surface": "Deprecated typed alias for stage comments; use /stage-workflow-records/{workflowRecordId}/comments",
+    "authority": "Deprecated route; Web uses canonical typed comments and the server-returned canDelete flag"
+  },
+  "POST /api/v1/stage-workflows": {
+    "phase": "P5",
+    "surface": "Create one inactive workflow from the current server configuration catalog",
+    "authority": "workflows:manage UI guard + server catalog/candidate scope; browser sends no locally inferred object, field, approval, member, or department value"
+  },
+  "POST /api/v1/stage-workflows/{workflowId}/records/{recordId}": {
+    "phase": "P5",
+    "surface": "Start a Customer workflow selected from the exact server-authorized applicable list",
+    "authority": "customer detail route + server-confirmed record visibility and canStart; browser must not infer start eligibility"
+  },
+  "POST /api/v1/stage-workflows/query": {
+    "phase": "P5",
+    "surface": "Page typed, versioned stage-workflow definition summaries",
+    "authority": "workflows:read UI guard + active membership; management actions remain server-returned capabilities"
+  },
+  "POST /api/v1/stage-workflows/records/{workflowRecordId}/comments": {
+    "phase": "P5",
+    "surface": "Deprecated typed alias for adding a stage comment; use /stage-workflow-records/{workflowRecordId}/comments",
+    "authority": "Deprecated route; Web uses the canonical route and server rechecks COMMENT capability"
+  },
+  "PUT /api/v1/stage-workflows/{workflowId}": {
+    "phase": "P5",
+    "surface": "Replace a workflow only from a complete current editable baseline",
+    "authority": "workflows:manage UI guard + resource UPDATE + all stages editable + matching version; non-editable definitions fail closed without a partial rewrite"
+  },
+  "PUT /api/v1/stage-workflows/{workflowId}/status": {
+    "phase": "P5",
+    "surface": "Change a workflow only to a current server-advertised target status",
+    "authority": "workflows:manage UI guard + resource CHANGE_STATUS + allowedStatuses + matching version; browser does not derive lifecycle transitions"
+  },
+  "PUT /api/v1/stage-workflows/records/{workflowRecordId}/advance": {
+    "phase": "P5",
+    "surface": "Deprecated typed alias for advancement; use /stage-workflow-records/{workflowRecordId}/advance",
+    "authority": "Deprecated route; Web uses the canonical record's allowedActions, writableFieldCodes, allowedTaskCodes, and version"
+  },
+  "PUT /api/v1/stage-workflows/records/{workflowRecordId}/outcome": {
+    "phase": "P5",
+    "surface": "Deprecated typed alias for outcome changes; use /stage-workflow-records/{workflowRecordId}/outcome",
+    "authority": "Deprecated route; Web uses the canonical record's allowedActions and version"
+  },
+  "GET /api/v1/customers": {
+    "phase": "P2/P3",
+    "surface": "Query the typed server-scoped customer page, including bounded candidates for contact/opportunity customer filters",
+    "authority": "customers:read; candidates retain only ID/name"
+  },
+  "POST /api/v1/customers/query": {
+    "phase": "P2/P3",
+    "surface": "Query the typed server-scoped customer page from URL, saved-view, or in-memory advanced criteria",
+    "authority": "customers:read; server rechecks data scope and field access, while customer filter candidates retain only ID/name"
+  },
+  "GET /api/v1/customers/{customerId}": {
+    "surface": "Get a visible customer, including confirmation of recovered contact/opportunity filters and display-only custom scalar values",
+    "authority": "customers:read; exact ID must match before the list query sends `customerId`; custom values render only with current `fields:read` metadata and never become an update baseline"
+  },
+  "PUT /api/v1/customers/{customerId}": {
+    "surface": "Merge explicitly changed catalog-backed scalar customer custom-field codes into one visible customer using its current version",
+    "authority": "customers:write; the optional editor additionally requires fields:read, USER/DEPARTMENT candidates require organization:read, and the server rechecks record visibility, field write policy, field type/options, candidate visibility, requiredness, and version"
+  },
+  "GET /api/v1/contacts": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped contact page, including a confirmed customer relation scope",
+    "authority": "contacts:read; `customerId` is sent only after customers:read and same-identity directory/detail confirmation; the server reapplies data scope and field access"
+  },
+  "POST /api/v1/contacts/query": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped contact page from URL, saved-view, or in-memory advanced criteria, including a confirmed customer relation scope",
+    "authority": "contacts:read; `customerId` is sent only after customers:read and same-identity directory/detail confirmation; the server reapplies data scope and field access"
+  },
+  "GET /api/v1/dashboard/overview": {
+    "phase": "P1",
+    "surface": "Read the caller's fixed sales dashboard, permission-aware sales brief, and selected returned trend points",
+    "authority": "后端路由 guard; browser does not aggregate, fill, or synthesize metrics"
+  },
+  "POST /api/v1/customers/batch/tags": {
+    "surface": "Change tags for a bounded, versioned customer batch selected from the customer list",
+    "authority": "customers:write + TAGS field write access; browser sends selected current-page versions and refetches after success"
+  },
+  "POST /api/v1/customers": {
+    "surface": "Create a customer from permitted basic fields, catalog-backed dynamic values, one explicitly entered primary address, explicitly selected tags, an optional server-confirmed parent, an optional server member owner, and confirmed same-draft FILE IDs",
+    "authority": "customers:write; scalar custom field metadata requires fields:read but never proves write access; USER/DEPARTMENT candidates require organization:read and remain server-validated; FILE values require files:write plus the same active CUSTOMER draft and UPLOADED IDs; optional owner requires customers:assign + organization:read; parent candidates require customers:read plus same-identity detail confirmation; tag candidates require customers:read and unmasked TAGS field; server rechecks OWNER/PARENT_CUSTOMER/ADDRESSES/custom field/TAGS/FILE access, visibility, hierarchy, draft ownership, address capacity, and validation"
+  },
+  "POST /api/v1/contacts/batch/tags": {
+    "surface": "Change tags for a bounded, versioned contact batch selected from the contact list",
+    "authority": "contacts:write + TAGS field write access; browser sends selected current-page versions and refetches after success"
+  },
+  "POST /api/v1/contacts/batch/delete": {
+    "surface": "Delete a bounded, versioned contact batch after explicit confirmation",
+    "authority": "contacts:delete; browser submits current-page contactId/version pairs and refetches only after the server confirms the atomic result"
+  },
+  "PUT /api/v1/contacts/batch/owner": {
+    "surface": "Transfer a bounded, versioned contact batch to one server-listed active member",
+    "authority": "contacts:assign + organization:read; member candidates are server-scoped and the server rechecks owner scope, field policy, membership, visibility, and every version"
+  },
+  "POST /api/v1/contacts": {
+    "surface": "Create a contact from permitted basic fields, one explicit primary address, explicitly selected tags, an optional server-confirmed customer relation, and catalog-backed custom fields; FILE values bind only to confirmed files in one CONTACT draft",
+    "authority": "contacts:write; optional customer requires customers:read plus same-identity directory/detail confirmation; tag candidates require contacts:read and unmasked TAGS field; custom-field catalog requires fields:read, USER/DEPARTMENT candidates require organization:read, and FILE binding requires files:write; server rechecks ADDRESS/CUSTOMER/TAGS/custom-field access, candidate visibility, draft ownership, requiredness, and data scope"
+  },
+  "POST /api/v1/opportunities": {
+    "surface": "Create an opportunity from server-visible customer, active pipeline/stage catalogs, explicitly entered optional dates/amount/description, optional contacts from the selected customer's visible directory, and catalog-backed custom fields; FILE values bind only to confirmed files in one OPPORTUNITY draft",
+    "authority": "opportunities:write + customers:read + opportunity-pipelines:read; optional contacts require contacts:read and explicit server-directory selection; custom-field catalog requires fields:read, USER/DEPARTMENT candidates require organization:read, and FILE binding requires files:write; server rechecks field access, candidate visibility, draft ownership, requiredness, and data scope"
+  },
+  "POST /api/v1/leads/batch/tags": {
+    "surface": "Change tags for a bounded, versioned lead batch selected from the lead list",
+    "authority": "leads:write + TAGS field write access; browser sends selected current-page versions and refetches after success"
+  },
+  "POST /api/v1/leads/batch/delete": {
+    "surface": "Delete a bounded, versioned lead batch after explicit confirmation",
+    "authority": "leads:delete; browser submits current-page leadId/version pairs and refetches only after the server confirms the atomic result"
+  },
+  "POST /api/v1/opportunities/batch/delete": {
+    "surface": "Delete a bounded, versioned opportunity batch after explicit confirmation",
+    "authority": "opportunities:delete; browser submits current-page opportunityId/version pairs and refetches only after the server confirms the atomic result"
+  },
+  "PUT /api/v1/opportunities/batch/owner": {
+    "surface": "Transfer a bounded, versioned opportunity batch to one server-listed active member",
+    "authority": "opportunities:assign + organization:read; member candidates are server-scoped and the server rechecks owner scope, field policy, membership, visibility, and every version"
+  },
+  "PUT /api/v1/leads/batch/owner": {
+    "surface": "Transfer a bounded, versioned lead batch to one server-listed active member",
+    "authority": "leads:assign + organization:read; member candidates are server-scoped and the server rechecks owner scope, field policy, membership, visibility, and every version"
+  },
+  "PUT /api/v1/products/{productId}": {
+    "surface": "Replace product base fields from the server-issued complete editable baseline and current version; merge only catalog-backed scalar custom-field codes explicitly changed in the edit form",
+    "authority": "products:write + server-issued editable baseline; scalar custom fields additionally require fields:read, USER/DEPARTMENT candidates require organization:read, and the server requires products:read, unmasked writable replacement fields, field policy/type validity, record visibility, category validity, and current version"
+  },
+  "GET /api/v1/customers/tags": {
+    "surface": "Read the server-authorized unmasked customer tag catalog before tag replacement",
+    "authority": "customers:read + unmasked TAGS field access"
+  },
+  "GET /api/v1/customers/nearby": {
+    "surface": "Query server-visible customers after explicit browser geolocation",
+    "authority": "customers:read + unmasked ADDRESSES field access"
+  },
+  "GET /api/v1/contacts/nearby": {
+    "surface": "Query server-visible contacts after explicit browser geolocation",
+    "authority": "contacts:read + unmasked ADDRESSES field access"
+  },
+  "PUT /api/v1/customers/{customerId}/tags": {
+    "surface": "Version-replace one visible customer's tag collection",
+    "authority": "customers:write + TAGS field write access"
+  },
+  "DELETE /api/v1/customers/{customerId}": {
+    "surface": "Explicitly soft-delete a customer without active children using its current version",
+    "authority": "customers:delete"
+  },
+  "DELETE /api/v1/contacts/{contactId}": {
+    "surface": "Explicitly soft-delete a contact without active children using its current version",
+    "authority": "contacts:delete"
+  },
+  "PUT /api/v1/contacts/{contactId}": {
+    "surface": "Update contact base fields, modify or explicitly clear next-contact time, set, replace, or explicitly clear its customer relation, and merge explicitly changed catalog-backed scalar custom-field codes with the returned version",
+    "authority": "contacts:write; customer selection and explicit relation clearing are additionally guarded by customers:read, the optional custom-field editor requires fields:read and organization:read for USER/DEPARTMENT candidates, while the server rechecks record visibility, field access, relation validity, type/options, candidate visibility, requiredness, and version"
+  },
+  "POST /api/v1/contracts/query": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped global contract page with URL keyword, pagination, and server-confirmed customer or opportunity relations",
+    "authority": "contracts:read UI guard; customer selector additionally requires customers:read; opportunity selector additionally requires opportunities:read and retains only ID/name; server applies record data scope and field access"
+  },
+  "POST /api/v1/contracts/summary": {
+    "phase": "P1",
+    "surface": "Render the server-calculated contract total, received amount, and outstanding amount for the active global-contract filters without summing browser rows",
+    "authority": "contracts:read + receivables:read UI guards; server rechecks contract and receivable data scopes plus unmasked TOTAL_AMOUNT/AMOUNT field access, while the browser only formats the generated aggregate"
+  },
+  "POST /api/v1/receivables/summary": {
+    "phase": "P1",
+    "surface": "Render the server-calculated receivable amount for the active global-receivable filters without summing browser rows",
+    "authority": "receivables:read UI guard; server rechecks receivable data scope plus unmasked AMOUNT field access, while the browser only formats the generated aggregate"
+  },
+  "POST /api/v1/receivable-plans/summary": {
+    "phase": "P1",
+    "surface": "Render server-calculated planned, received, and remaining amounts for the active global-receivable-plan filters without summing browser rows",
+    "authority": "receivable-plans:read + receivables:read UI guards; server rechecks plan and receipt data scopes plus unmasked PLANNED_AMOUNT/AMOUNT field access, while the browser only formats the generated aggregate"
+  },
+  "GET /api/v1/contracts/{contractId}": {
+    "surface": "Read the typed server-visible contract detail or confirm a recovered global contract relation filter",
+    "authority": "customer-context routes and global contract filters require contracts:read + customers:read + returned customer ID match"
+  },
+  "GET /api/v1/contracts/{contractId}/collaborators": {
+    "surface": "Read the complete, versioned contract collaborator baseline before replacement",
+    "authority": "contracts:assign + contract owner scope; the response also contains server-verified callerState"
+  },
+  "POST /api/v1/contracts": {
+    "surface": "Create a customer-context contract with optional dates, terms, 0..100 whole-order discount, server-visible product quantities or unit prices, and catalog-backed custom fields; FILE values bind only to confirmed files in one CONTRACT draft",
+    "authority": "contracts:write + customers:read + customer record visibility + NAME/NUMBER/CUSTOMER write access; non-empty products also require products:read; custom-field catalog requires fields:read, USER/DEPARTMENT candidates require organization:read, and FILE binding requires files:write; server validates product availability, price, terms, dates, discount, number uniqueness, field access, candidate visibility, draft ownership, requiredness, and data scope"
+  },
+  "DELETE /api/v1/contracts/{contractId}": {
+    "surface": "Explicitly soft-delete one customer-context contract with its narrow projection version",
+    "authority": "contracts:delete + contract owner scope + current version; server rejects contracts with invoices, receivables, or receivable plans"
+  },
+  "GET /api/v1/invoice-profiles": {
+    "surface": "List the current customer's narrowly projected invoice profiles",
+    "authority": "invoices:read + customers:read + customer record visibility"
+  },
+  "POST /api/v1/invoice-profiles": {
+    "surface": "Create a customer-context personal invoice profile with an explicit title only",
+    "authority": "invoices:write + customers:read + customer record visibility"
+  },
+  "POST /api/v1/invoices": {
+    "surface": "Create a customer-context invoice application from a server-visible contract, explicit amount/date/type, title, catalog-backed scalar custom fields, and same-draft uploaded FILE bindings",
+    "authority": "invoices:write + contracts:read + customers:read + contract/customer record visibility + INVOICE CUSTOMER/CONTRACT/AMOUNT/INVOICE_TYPE/TITLE_TYPE/TITLE/OWNER_ACTOR write access; `fields:read` gates metadata, `organization:read` gates USER/DEPARTMENT candidates, and `files:write` gates the same INVOICE draft; server rechecks optional title, registration, shipping, remark, custom-field/file policies, draft ownership, and available contract amount"
+  },
+  "DELETE /api/v1/invoice-profiles/{profileId}": {
+    "surface": "Soft-delete one customer-context invoice profile with its returned version",
+    "authority": "invoices:delete + customer record visibility + current version"
+  },
+  "DELETE /api/v1/invoices/{invoiceId}": {
+    "surface": "Explicitly soft-delete one customer-context invoice with its narrow projection version",
+    "authority": "invoices:delete + invoice owner scope + current version"
+  },
+  "PUT /api/v1/invoices/{invoiceId}/issue": {
+    "surface": "Register a pending customer-context invoice result from directly entered invoice number, issued date, and optional logistics number",
+    "authority": "invoices:issue + invoice write scope + STATUS/INVOICE_NUMBER/ISSUED_DATE/LOGISTICS_NUMBER write access + current version; server requires PENDING status"
+  },
+  "PUT /api/v1/invoices/{invoiceId}/reset": {
+    "surface": "Reset an issued customer-context invoice with its narrow projection version",
+    "authority": "invoices:issue + invoice write scope + STATUS/INVOICE_NUMBER/ISSUED_DATE/LOGISTICS_NUMBER write access + current version; server requires ISSUED status"
+  },
+  "PUT /api/v1/invoices/{invoiceId}/owner": {
+    "surface": "Change one customer-context invoice owner from the server-visible active-member directory",
+    "authority": "invoices:assign + organization:read + invoice owner scope + OWNER_ACTOR write access + active assignable member + current version"
+  },
+  "POST /api/v1/invoices/query": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped global invoice page with URL keyword, pagination, and server-confirmed customer or contract relations",
+    "authority": "invoices:read UI guard; customer selector additionally requires customers:read and contract selector contracts:read + customers:read; server applies record data scope and field access"
+  },
+  "GET /api/v1/invoices/{invoiceId}": {
+    "surface": "Read a typed customer-context invoice through a money-free narrow detail projection",
+    "authority": "invoices:read + customers:read (customer-context guard) + returned customer ID match"
+  },
+  "DELETE /api/v1/receivables/{receivableId}": {
+    "surface": "Explicitly soft-delete one customer-context receivable with its narrow projection version",
+    "authority": "receivables:delete + receivable owner scope + current version"
+  },
+  "PUT /api/v1/receivables/{receivableId}/owner": {
+    "surface": "Change one customer-context receivable owner from the server-visible active-member directory",
+    "authority": "receivables:assign + organization:read + receivable owner scope + OWNER_ACTOR write access + active assignable member + current version"
+  },
+  "DELETE /api/v1/receivable-plans/{planId}": {
+    "surface": "Explicitly soft-delete one customer-context receivable plan with its narrow projection version",
+    "authority": "receivable-plans:delete + contracts:read + plan owner scope + current version; server rejects plans with receipt history"
+  },
+  "POST /api/v1/receivables/query": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped global receivable page with URL keyword, pagination, and server-confirmed customer, contract, or receivable-plan relations",
+    "authority": "receivables:read UI guard; customer selector additionally requires customers:read, contract selector contracts:read + customers:read, and receivable-plan selector receivable-plans:read + customers:read; server applies record data scope and field access"
+  },
+  "GET /api/v1/receivables/{receivableId}": {
+    "surface": "Read a customer-context receivable through a money-free narrow detail projection",
+    "authority": "receivables:read + customers:read (customer-context guard) + returned customer ID match"
+  },
+  "POST /api/v1/receivables": {
+    "surface": "Create a customer-context receivable from a server-visible contract, optionally associating one server-visible available plan, explicit received date/amount/payment/remark, catalog-backed scalar custom fields, and same-draft uploaded FILE bindings",
+    "authority": "receivables:write + contracts:read + customers:read + active contract/customer record visibility + RECEIVABLE CUSTOMER/CONTRACT/RECEIVED_DATE/PAYMENT_METHOD/AMOUNT/OWNER_ACTOR write access; optional plan requires receivable-plans:read and readable PLAN/CUSTOMER/CONTRACT/PLANNED_AMOUNT/RECEIVED_AMOUNT/REMAINING_AMOUNT fields; `fields:read` gates metadata, `organization:read` gates USER/DEPARTMENT candidates, and `files:write` gates the same RECEIVABLE draft; server rechecks REMARK, custom-field/file policies, draft ownership, and available amount"
+  },
+  "POST /api/v1/receivable-plans/query": {
+    "surface": "List the typed server-visible receivable-plan page in a customer-context money-free projection or safe global receivable-plan relation candidates",
+    "authority": "customer-context routes and global plan-filter candidates require receivable-plans:read + customers:read + unmasked RECEIVABLE_PLAN CUSTOMER field access + customer record visibility; candidates retain only ID and installment"
+  },
+  "GET /api/v1/receivable-plans/{planId}": {
+    "surface": "Read a typed customer-context receivable plan through a money-free narrow detail projection or confirm a recovered global receivable-plan relation filter",
+    "authority": "customer-context routes and global plan filters require receivable-plans:read + customers:read + returned customer ID match"
+  },
+  "GET /api/v1/receivable-plans/available": {
+    "surface": "List money-free receivable-plan selection candidates for one selected server-visible contract",
+    "authority": "receivable-plans:read + contracts:read + contract visibility + unmasked RECEIVABLE_PLAN CONTRACT/PLANNED_AMOUNT and one of RECEIVED_AMOUNT/REMAINING_AMOUNT/PROGRESS read access"
+  },
+  "POST /api/v1/receivable-plans": {
+    "surface": "Create a customer-context receivable plan from a server-visible contract, explicit due date/amount/payment/reminder/remark, catalog-backed scalar custom fields, and same-draft uploaded FILE bindings",
+    "authority": "receivable-plans:write + contracts:read + customers:read + active contract/customer record visibility + RECEIVABLE_PLAN CUSTOMER/CONTRACT/DUE_DATE/PLANNED_AMOUNT/PAYMENT_METHOD/OWNER_ACTOR/REMINDER_DAYS write access; `fields:read` gates metadata, `organization:read` gates USER/DEPARTMENT candidates, and `files:write` gates the same RECEIVABLE_PLAN draft; server rechecks REMARK, custom-field/file policies, draft ownership, and available amount"
+  },
+  "POST /api/v1/receivable-plans/batch": {
+    "surface": "Atomically create customer-context receivable plans from one server-visible contract and directly entered date, amount, payment-method, optional reminder/remark, and catalog-backed scalar dynamic-field rows",
+    "authority": "receivable-plans:write + contracts:read + customers:read + active contract/customer record visibility + RECEIVABLE_PLAN CUSTOMER/CONTRACT/DUE_DATE/PLANNED_AMOUNT/PAYMENT_METHOD/OWNER_ACTOR/REMINDER_DAYS write access; row remarks require REMARK write access; scalar dynamic metadata requires fields:read and USER/DEPARTMENT candidates require organization:read; the generated batch contract has no file-draft binding, so required FILE/RELATION fields keep the UI closed; server fixes owner to caller and checks each row's field policy and aggregate available amount"
+  },
+  "PUT /api/v1/contracts/{contractId}": {
+    "surface": "Deferred: Web uses PATCH for the only safe basic-field edit; no PUT surface is registered",
+    "authority": "contracts:write + explicit non-null fields + current version; current Web UI intentionally does not call it"
+  },
+  "PUT /api/v1/contracts/{contractId}/collaborators": {
+    "surface": "Replace contract collaborators from the authoritative versioned baseline",
+    "authority": "contracts:assign + contract owner scope + baseline version; candidate members require organization:read"
+  },
+  "DELETE /api/v1/contracts/{contractId}/collaborators/me": {
+    "surface": "Explicitly exit the caller's contract collaboration with the current detail version",
+    "authority": "contracts:write + server-confirmed caller collaborator + current version"
+  },
+  "PUT /api/v1/contracts/batch/collaborators": {
+    "phase": "P1",
+    "surface": "Add or update one server-directory team member as read-only or editable across the selected current-page contracts",
+    "authority": "contracts:assign + organization:read UI guards; every selected target supplies its returned version, and the server preserves unrelated collaborators while rechecking owner scope, active membership, and concurrency"
+  },
+  "DELETE /api/v1/contracts/batch/collaborators": {
+    "phase": "P1",
+    "surface": "Confirm removal of one server-directory team member across the selected current-page contracts",
+    "authority": "contracts:assign + organization:read UI guards; every selected target supplies its returned version, the server rejects owners and keeps absent memberships idempotent"
+  },
+  "POST /api/v1/contracts/batch/export/csv": {
+    "phase": "P1",
+    "surface": "Download a bounded CSV for only the selected current-page contracts",
+    "authority": "contracts:read + contracts:export UI guards; the browser submits only selected returned ID/version pairs, then saves the authenticated Blob while the server rechecks both scopes, field access, and current versions"
+  },
+  "PATCH /api/v1/contracts/{contractId}": {
+    "surface": "Update explicit contract name/number or explicitly changed catalog-backed scalar custom fields from the customer-context detail projection",
+    "authority": "contracts:write + contracts:read + customers:read route guard + current contract visibility + returned version; basic editor sends only changed name/number, while custom editor requires fields:read, sends only explicitly touched catalog codes, and requires organization:read for USER/DEPARTMENT candidates"
+  },
+  "PUT /api/v1/contracts/{contractId}/void": {
+    "surface": "Void an active customer-context contract with its narrow projection version",
+    "authority": "contracts:write + contract write scope + STATUS write access + current version; server requires ACTIVE status"
+  },
+  "PUT /api/v1/contracts/{contractId}/owner": {
+    "surface": "Change one customer-context contract owner from the server-visible active-member directory",
+    "authority": "contracts:assign + organization:read + contract owner scope + OWNER_ACTOR write access + active assignable member + current version"
+  },
+  "PUT /api/v1/invoice-profiles/{profileId}": {
+    "surface": "Deferred: Web uses PATCH for the only safe individual-title edit; no PUT surface is registered",
+    "authority": "invoices:write + explicit non-null fields + current version; current Web UI intentionally does not call it"
+  },
+  "PUT /api/v1/invoices/{invoiceId}": {
+    "surface": "Equivalent partial-update route; Web deliberately uses PATCH for the customer-context detail editor instead of presenting duplicate PUT controls",
+    "authority": "invoices:write + contracts:read + invoices:read + customers:read route guards + current invoice visibility + returned version; explicit scalar custom-field changes additionally require fields:read and USER/DEPARTMENT candidates require organization:read"
+  },
+  "PUT /api/v1/receivables/{receivableId}": {
+    "surface": "Equivalent partial-update route; Web deliberately uses PATCH for the customer-context detail editor instead of presenting duplicate PUT controls",
+    "authority": "receivables:write + contracts:read + receivables:read + customers:read route guards + current receivable visibility + returned version; explicit scalar custom-field changes additionally require fields:read and USER/DEPARTMENT candidates require organization:read"
+  },
+  "PUT /api/v1/receivable-plans/{planId}": {
+    "surface": "Equivalent partial-update route; Web deliberately uses PATCH for the customer-context detail editor instead of presenting duplicate PUT controls",
+    "authority": "receivable-plans:write + contracts:read + receivable-plans:read + customers:read route guards + current plan visibility + returned version; explicit scalar custom-field changes additionally require fields:read and USER/DEPARTMENT candidates require organization:read"
+  },
+  "PATCH /api/v1/invoice-profiles/{profileId}": {
+    "surface": "Update an individual invoice profile's explicit title from the current customer list projection",
+    "authority": "invoices:write + invoices:read + customers:read route guard + current customer visibility + returned version; UI sends only title"
+  },
+  "PATCH /api/v1/invoices/{invoiceId}": {
+    "surface": "Update an invoice's explicit requested date/type or explicitly changed catalog-backed scalar custom fields from the customer-context detail projection",
+    "authority": "invoices:write + contracts:read + invoices:read + customers:read route guards + current invoice visibility + returned version; basic editor sends only changed requestedDate/invoiceType, while custom editor requires fields:read, sends only explicitly touched catalog codes, and requires organization:read for USER/DEPARTMENT candidates"
+  },
+  "PATCH /api/v1/receivables/{receivableId}": {
+    "surface": "Update a receivable's explicit received date or explicitly changed catalog-backed scalar custom fields from the customer-context detail projection",
+    "authority": "receivables:write + contracts:read + receivables:read + customers:read route guards + current receivable visibility + returned version; basic editor sends only changed receivedDate, while custom editor requires fields:read, sends only explicitly touched catalog codes, and requires organization:read for USER/DEPARTMENT candidates"
+  },
+  "PATCH /api/v1/receivable-plans/{planId}": {
+    "surface": "Update a receivable plan's explicit due date or explicitly changed catalog-backed scalar custom fields from the customer-context detail projection",
+    "authority": "receivable-plans:write + contracts:read + receivable-plans:read + customers:read route guards + current plan visibility + returned version; basic editor sends only changed dueDate, while custom editor requires fields:read, sends only explicitly touched catalog codes, and requires organization:read for USER/DEPARTMENT candidates"
+  },
+  "DELETE /api/v1/contact-pools/{poolId}": {
+    "surface": "Soft-delete a versioned empty contact pool"
+  },
+  "GET /api/v1/fields/objects": {
+    "phase": "P7",
+    "surface": "List server-authorized customizable business objects for field administration",
+    "authority": "fields:read route guard; object types always come from the server catalog"
+  },
+  "GET /api/v1/fields/objects/{objectType}": {
+    "phase": "P7",
+    "surface": "Read the selected business object's field definitions",
+    "authority": "fields:read route guard; includeInactive is requested only under fields:write"
+  },
+  "POST /api/v1/fields/objects/{objectType}": {
+    "phase": "P7",
+    "surface": "Create a custom field from generated field-type and option contracts",
+    "authority": "fields:write UI guard; object type and enum values come from the server snapshot"
+  },
+  "PUT /api/v1/fields/objects/{objectType}/{fieldId}": {
+    "phase": "P7",
+    "surface": "Update an active custom field with its current version",
+    "authority": "fields:write UI guard; browser only exposes server-returned non-builtin fields and sends their version"
+  },
+  "DELETE /api/v1/fields/objects/{objectType}/{fieldId}": {
+    "phase": "P7",
+    "surface": "Explicitly deactivate an active custom field with its current version",
+    "authority": "fields:write UI guard + explicit confirmation; server decides dependency conflicts and transition eligibility"
+  },
+  "GET /api/v1/fields/objects/{objectType}/layout": {
+    "phase": "P7",
+    "surface": "Read the current member's complete field-layout baseline",
+    "authority": "fields:read route guard; layout cache is identity and object scoped"
+  },
+  "PUT /api/v1/fields/objects/{objectType}/layout": {
+    "phase": "P7",
+    "surface": "Replace the current member's complete field layout",
+    "authority": "fields:read UI guard; first write omits a null initial version, later writes use the returned version"
+  },
+  "GET /api/v1/fields/roles/{roleId}/objects/{objectType}/access": {
+    "phase": "P7",
+    "surface": "Read a server-selected custom role's complete field-policy baseline",
+    "authority": "fields:write + authorization:read UI guards; role IDs only come from the server role directory"
+  },
+  "PUT /api/v1/fields/roles/{roleId}/objects/{objectType}/access": {
+    "phase": "P7",
+    "surface": "Replace one custom role's complete field-policy baseline",
+    "authority": "fields:write + authorization:write + authorization:assign UI guards; first write omits a null initial version"
+  },
+  "POST /api/v1/leads/{leadId}/convert": {
+    "surface": "Convert an active lead into a customer and contact with the current version",
+    "phase": "P3",
+    "authority": "leads:convert + customers:write + contacts:write"
+  },
+  "DELETE /api/v1/leads/{leadId}": {
+    "surface": "Explicitly soft-delete a lead without active children using its current version",
+    "authority": "leads:delete"
+  },
+  "GET /api/v1/leads": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped lead page, including active or converted scenes",
+    "authority": "leads:read; the server reapplies data scope and field access"
+  },
+  "POST /api/v1/leads/query": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped lead page from URL, saved-view, or in-memory advanced criteria, including active or converted scenes",
+    "authority": "leads:read; the server reapplies data scope and field access"
+  },
+  "GET /api/v1/leads/{leadId}": {
+    "surface": "Get a server-scoped visible lead, including only server-returned address projections"
+  },
+  "GET /api/v1/leads/{leadId}/collaborators": {
+    "surface": "Read the authoritative lead collaborator replacement baseline",
+    "authority": "leads:assign"
+  },
+  "GET /api/v1/leads/nearby": {
+    "surface": "Query visible leads near an explicitly authorized browser coordinate",
+    "authority": "leads:read"
+  },
+  "GET /api/v1/activities/options": {
+    "surface": "Read server-governed follow-up method options before a supported record activity is created",
+    "authority": "activities:read"
+  },
+  "GET /api/v1/activities/{activityId}": {
+    "surface": "Read the caller-authorized complete baseline before activity edit or deletion",
+    "authority": "activities:read + activities:write + caller-owned follow-up"
+  },
+  "POST /api/v1/activities": {
+    "surface": "Create a follow-up for a supported server-visible record from a server-governed method choice with an optional next-contact time",
+    "authority": "activities:read + activities:write + subject record write visibility"
+  },
+  "POST /api/v1/activities/batch": {
+    "surface": "Atomically create one same-form follow-up for up to 100 selected lead, contact, customer, or opportunity list records",
+    "authority": "activities:read + activities:write UI guard + current list read guard; browser sends only fixed subject type/ID plus chosen method, purpose, content, and occurred time, while the server rechecks membership, each record write visibility, tenant, and atomicity"
+  },
+  "POST /api/v1/activities/query": {
+    "phase": "P3",
+    "surface": "Read the typed first narrow follow-up timeline page for a supported server-visible record",
+    "authority": "activities:read + subject record visibility"
+  },
+  "PUT /api/v1/activities/{activityId}": {
+    "surface": "Version-update a caller-owned follow-up from its complete server baseline, explicitly allowing nextContactTime: null to clear it",
+    "authority": "activities:read + activities:write + caller-owned follow-up"
+  },
+  "DELETE /api/v1/activities/{activityId}": {
+    "surface": "Explicitly soft-delete a caller-owned follow-up with its current version",
+    "authority": "activities:read + activities:write + caller-owned follow-up"
+  },
+  "POST /api/v1/return-visits/query": {
+    "phase": "P1",
+    "surface": "Query the typed server-scoped global return-visit page with URL keyword, pagination, and server-confirmed customer or contract relations",
+    "authority": "return-visits:read UI guard; customer selector additionally requires customers:read and contract selector contracts:read + customers:read; server applies record data scope and field access"
+  },
+  "GET /api/v1/return-visits/{returnVisitId}": {
+    "surface": "Read one server-authorized return visit inside its returned customer context, including display-only custom scalar values",
+    "authority": "return-visits:read + unmasked CUSTOMER field access; custom values render only with current `fields:read` metadata and never become an update baseline"
+  },
+  "POST /api/v1/return-visits": {
+    "surface": "Create a return visit with optional form, satisfaction, feedback, customer relations, catalog-backed scalar custom fields, and same-draft uploaded FILE bindings",
+    "authority": "return-visits:write + customer record visibility + CUSTOMER/OWNER/VISIT_TIME and submitted VISIT_FORM/SATISFACTION/REMARK/CONTACT/CONTRACT write access; contact selection additionally requires contacts:read + customers:read and contract selection contracts:read + customers:read; `fields:read` gates metadata, `organization:read` gates USER/DEPARTMENT candidates, and `files:write` gates the same RETURN_VISIT draft"
+  },
+  "PUT /api/v1/return-visits/{returnVisitId}": {
+    "surface": "Update changed visit time, form, satisfaction, feedback, one visible relation, or explicitly changed catalog-backed scalar custom fields while retaining omitted fields",
+    "authority": "return-visits:read + return-visits:write + current version + changed-field write access; relation, form, or satisfaction clearing requires the generated nullable field and explicit user confirmation where applicable; custom editor additionally requires fields:read, a current unmasked visit-time/remark baseline, server-authorized VISIT_TIME and REMARK write access, sends only explicitly touched catalog codes, and requires organization:read for USER/DEPARTMENT candidates"
+  },
+  "PUT /api/v1/return-visits/{returnVisitId}/owner": {
+    "surface": "Change a return-visit owner from the server-visible active-member directory",
+    "authority": "return-visits:assign + organization:read + current version + OWNER_ACTOR write access"
+  },
+  "DELETE /api/v1/return-visits/{returnVisitId}": {
+    "surface": "Explicitly soft-delete a return visit from its server-authorized detail with the current version",
+    "authority": "return-visits:delete + return-visit owner scope + current version; server withdraws attachments and FILE bindings"
+  },
+  "POST /api/v1/opportunities/query": {
+    "surface": "Query visible opportunities with a generated request body, confirmed customer scope, or safe global contract opportunity relation candidates",
+    "authority": "opportunities:read; `customerId` requires customers:read and same-identity customer confirmation; relation candidates retain only stable ID/name and are confirmed by the same visible detail before contract queries send opportunityId"
+  },
+  "POST /api/v1/products/query": {
+    "surface": "Query the typed money-free product catalog page with a generated request body and confirmed category scope",
+    "authority": "products:read; `categoryId` is sent only after the same category tree still contains that exact ID"
+  },
+  "POST /api/v1/products/export/csv": {
+    "phase": "P3",
+    "surface": "Export bounded server-visible products with the active list keyword, category, availability, sorting, and saved or temporary filters",
+    "authority": "products:read + products:export UI guards; the server rechecks membership, current field read/mask policy, filters, and the CSV row/byte bounds"
+  },
+  "POST /api/v1/products": {
+    "surface": "Create a product with required fields, optional catalog category/unit/description/availability, catalog-backed scalar custom fields, and same-draft uploaded FILE bindings",
+    "authority": "products:write; category choices are read only from the current server tree under products:read; custom metadata requires fields:read, USER/DEPARTMENT candidates require organization:read, and FILE uploads require files:write with the same PRODUCT draft"
+  },
+  "PUT /api/v1/products/{productId}/availability": {
+    "surface": "Change product availability with the current version",
+    "authority": "products:write"
+  },
+  "PUT /api/v1/products/{productId}/owner": {
+    "surface": "Assign a product owner from the server-visible member directory with version",
+    "authority": "products:assign + organization:read"
+  },
+  "GET /api/v1/product-categories": {
+    "surface": "Read the server-governed product category tree through a narrow runtime projection and confirm product-list category filters",
+    "authority": "products:read; candidates retain only ID/name path"
+  },
+  "POST /api/v1/product-categories": {
+    "surface": "Create a root or server-tree child product category with its required name",
+    "authority": "products:write"
+  },
+  "PUT /api/v1/product-categories/{categoryId}": {
+    "surface": "Rename or move a product category with its server-tree version and an explicit safe parent",
+    "authority": "products:write"
+  },
+  "DELETE /api/v1/product-categories/{categoryId}": {
+    "surface": "Explicitly soft-delete an unused product category with its current version",
+    "authority": "products:delete"
+  },
+  "DELETE /api/v1/products/{productId}": {
+    "surface": "Explicitly soft-delete a product with its current version",
+    "authority": "products:delete"
+  },
+  "DELETE /api/v1/opportunities/{opportunityId}": {
+    "surface": "Explicitly soft-delete an opportunity with its current version",
+    "authority": "opportunities:delete"
+  },
+  "DELETE /api/v1/opportunity-pipelines/{pipelineId}": {
+    "surface": "Explicitly delete an inactive sales pipeline with its server-returned version after all stages are deleted",
+    "authority": "opportunity-pipelines:manage; the server rechecks lifecycle, stage dependency, active membership, tenant catalog and version"
+  },
+  "DELETE /api/v1/opportunity-pipelines/{pipelineId}/stages/{stageId}": {
+    "surface": "Explicitly delete an inactive sales stage with its server-returned version",
+    "authority": "opportunity-pipelines:manage; the server rechecks parent lifecycle, active membership, tenant catalog and version"
+  },
+  "GET /api/v1/opportunity-pipelines/{pipelineId}": {
+    "surface": "Reserved generated contract read; catalog management currently uses the bounded server catalog query",
+    "authority": "opportunity-pipelines:read"
+  },
+  "GET /api/v1/opportunity-pipelines/{pipelineId}/stages/{stageId}": {
+    "surface": "Reserved generated contract read; catalog management currently uses the bounded server stage query",
+    "authority": "opportunity-pipelines:read"
+  },
+  "POST /api/v1/opportunity-pipelines": {
+    "surface": "Create an inactive sales pipeline from an explicitly entered immutable code, name and display order",
+    "authority": "opportunity-pipelines:manage; the server owns code uniqueness, tenant catalog capacity and initial lifecycle"
+  },
+  "POST /api/v1/opportunity-pipelines/query": {
+    "phase": "P3",
+    "surface": "Read the typed bounded tenant sales-pipeline catalog for the internal management page",
+    "authority": "opportunity-pipelines:read; identity-isolated cache and no record data scope inference"
+  },
+  "POST /api/v1/opportunity-pipelines/{pipelineId}/stages": {
+    "surface": "Create an inactive stage under one server-returned non-deleted sales pipeline",
+    "authority": "opportunity-pipelines:manage; the server owns immutable code, capacity and parent lifecycle"
+  },
+  "POST /api/v1/opportunity-pipelines/{pipelineId}/stages/query": {
+    "phase": "P3",
+    "surface": "Read the typed bounded stage catalog for one selected server-returned sales pipeline",
+    "authority": "opportunity-pipelines:read; identity-isolated cache and no record data scope inference"
+  },
+  "PUT /api/v1/opportunity-pipelines/{pipelineId}": {
+    "surface": "Version-update a sales pipeline name and display order while leaving its immutable code unchanged",
+    "authority": "opportunity-pipelines:manage; browser uses only the server-returned version and server rechecks tenant lifecycle"
+  },
+  "PUT /api/v1/opportunity-pipelines/{pipelineId}/status": {
+    "surface": "Explicitly activate or deactivate a sales pipeline with its server-returned version",
+    "authority": "opportunity-pipelines:manage; server confirms an active stage before activation"
+  },
+  "PUT /api/v1/opportunity-pipelines/{pipelineId}/stages/{stageId}": {
+    "surface": "Version-update a sales stage name, display order and probability while leaving its immutable code unchanged",
+    "authority": "opportunity-pipelines:manage; browser uses only the server-returned version and server rechecks parent lifecycle"
+  },
+  "PUT /api/v1/opportunity-pipelines/{pipelineId}/stages/{stageId}/status": {
+    "surface": "Explicitly activate or deactivate a sales stage with its server-returned version",
+    "authority": "opportunity-pipelines:manage; server prevents an active pipeline from losing its final active stage"
+  },
+  "PUT /api/v1/organization/profile": {
+    "surface": "Update the caller's explicitly entered local display profile from the header settings modal",
+    "authority": "organization:request UI guard; no tenant, actor, membership or authority values are sent or inferred"
+  },
+  "GET /api/v1/opportunities/{opportunityId}": {
+    "surface": "Get a visible opportunity through a narrow runtime detail projection or confirm a recovered global contract opportunity relation filter",
+    "authority": "opportunities:read; global contract filters require the returned ID to match"
+  },
+  "GET /api/v1/products/{productId}": {
+    "surface": "Read the visible product detail through the named product projection, including display-only custom scalar values",
+    "authority": "products:read UI guard + server-confirmed product visibility; custom values require current `fields:read` metadata and detail is never used as a full replacement baseline"
+  },
+  "GET /api/v1/products/{productId}/editable-baseline": {
+    "surface": "Read the authoritative complete product replacement baseline before opening the edit form",
+    "authority": "products:read + products:write; service returns business fields only when every replacement field is readable, unmasked, and writable"
+  },
+  "GET /api/v1/opportunities/{opportunityId}/products": {
+    "surface": "Read the typed complete opportunity product replacement baseline before opening the management dialog",
+    "authority": "opportunities:read + opportunities:write + products:read UI guards; server rechecks the PRODUCTS field write policy and version on replacement"
+  },
+  "POST /api/v1/opportunities/{opportunityId}/contacts/query": {
+    "surface": "Read server-visible contacts related to an opportunity",
+    "authority": "opportunities:read + contacts:read"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}": {
+    "surface": "Replace opportunity base fields from the server-issued complete editable baseline and current version; customer replacement uses an explicit server-visible customer candidate, pipeline/stage replacement uses one active server-listed pair, and only catalog-backed scalar custom-field codes explicitly changed in the edit form merge",
+    "authority": "opportunities:write + server-issued editable baseline; customer replacement additionally requires customers:read, pipeline/stage replacement additionally requires opportunity-pipelines:read, scalar custom fields additionally require fields:read, USER/DEPARTMENT candidates require organization:read, and the server rechecks read/write field access, record visibility, customer, pipeline, stage, field policy/type validity, requiredness, and version"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}/star": {
+    "surface": "Set the caller's personal server-visible opportunity star",
+    "authority": "opportunities:read"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}/stage": {
+    "surface": "Advance an opportunity through a server-listed active stage with version",
+    "authority": "opportunities:write + opportunity-pipelines:read"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}/outcome": {
+    "surface": "Update opportunity outcome and optional remark with version",
+    "authority": "opportunities:write"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}/owner": {
+    "surface": "Assign an opportunity owner from the server-visible member directory with version",
+    "authority": "opportunities:assign + organization:read"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}/primary-contact": {
+    "surface": "Set or clear an opportunity primary contact from the server-visible related contacts",
+    "authority": "opportunities:write + contacts:read"
+  },
+  "POST /api/v1/contact-pools/{poolId}/transfer": {
+    "surface": "Transfer all contacts to a server-listed active pool"
+  },
+  "POST /api/v1/leads": {
+    "surface": "Create a lead from permitted basic fields, one explicit primary address, selected tags/customer relation, catalog-backed scalar custom fields, and same-draft uploaded FILE bindings",
+    "authority": "leads:write; optional customer requires customers:read plus same-identity directory/detail confirmation; tag candidates require leads:read and unmasked TAGS field; custom metadata requires fields:read, USER/DEPARTMENT candidates require organization:read, and FILE uploads require files:write with the same LEAD draft"
+  },
+  "POST /api/v1/leads/duplicate-check": {
+    "surface": "Check a visible duplicate boolean without record disclosure"
+  },
+  "PUT /api/v1/leads/{leadId}": {
+    "surface": "Update permitted basic lead fields, modify or explicitly clear next-contact time, set, replace, or explicitly clear the customer relation, and merge explicitly changed catalog-backed scalar custom-field codes with version",
+    "authority": "leads:write; customer selection and explicit relation clearing are additionally guarded by customers:read, the optional custom-field editor requires fields:read and organization:read for USER/DEPARTMENT candidates, while the server rechecks record visibility, field access, lifecycle state, relation validity, type/options, candidate visibility, requiredness, and version"
+  },
+  "PUT /api/v1/leads/{leadId}/collaborators": {
+    "surface": "Replace lead collaborators with the current version",
+    "authority": "leads:assign"
+  },
+  "PUT /api/v1/leads/{leadId}/owner": {
+    "surface": "Change lead owner with the current version",
+    "authority": "leads:assign"
+  },
+  "POST /api/v1/work/tasks/query": {
+    "surface": "List server-visible Work tasks through a narrow browse projection",
+    "authority": "work-tasks:read + server-confirmed participant visibility"
+  },
+  "GET /api/v1/notifications/preferences": {
+    "phase": "P5",
+    "surface": "Read the current member's two typed external notification choices from the application-header settings modal",
+    "authority": "notifications:read UI guard + active membership; UI retains only emailEnabled and oaAnnouncementEmailEnabled"
+  },
+  "PUT /api/v1/notifications/preferences": {
+    "phase": "P5",
+    "surface": "Replace the current member's two typed external notification choices from the application-header settings modal",
+    "authority": "notifications:read UI guard + active membership; UI sends only emailEnabled and oaAnnouncementEmailEnabled"
+  },
+  "GET /api/v1/notifications": {
+    "phase": "P5",
+    "surface": "Page the current member's narrow Work notification inbox from the application-header modal while it is open",
+    "authority": "notifications:read + work-tasks:read UI guards + active membership + server-confirmed current task participation; UI retains no task ID, recipient, reminder projection, delivery data, or lifecycle timestamps"
+  },
+  "POST /api/v1/notifications/{notificationId}/read": {
+    "phase": "P5",
+    "surface": "Idempotently mark one visible narrow Work notification fact read from the application-header modal",
+    "authority": "notifications:read + work-tasks:read UI guards + server-confirmed current task participation; UI sends only notification ID and requires a same-ID READ response"
+  },
+  "GET /api/v1/work/task-series": {
+    "phase": "P5",
+    "surface": "List typed visible Work task series with recurrence rules and server-issued resource capabilities",
+    "authority": "work-tasks:read UI guard + server-confirmed participant visibility; UI retains only recurrence, status, version and allowedActions, then discards members, descriptions, blockers, automation state and occurrence history"
+  },
+  "POST /api/v1/work/task-series": {
+    "phase": "P5",
+    "surface": "Create a draft Work task series from a server-visible assignee and up to 50 unique followers, explicit title and non-empty description, an optional supported priority, and a complete local-calendar rule",
+    "authority": "work-tasks:read + work-tasks:write + organization:read UI guards + server-confirmed active assignee, followers and creator scope; UI accepts only LOW/NORMAL/HIGH/URGENT when a priority is explicitly selected, otherwise the server default applies; UI sends no automation state or reminders"
+  },
+  "POST /api/v1/work/task-series/{seriesId}/activate": {
+    "phase": "P5",
+    "surface": "Activate a paused Work task series only after the current resource advertises ACTIVATE",
+    "authority": "work-tasks:read UI guard + current series ACTIVATE capability + version; server rechecks caller, current state, scheduler readiness, recurrence and participant eligibility"
+  },
+  "POST /api/v1/work/task-series/{seriesId}/pause": {
+    "phase": "P5",
+    "surface": "Pause a Work task series only after the current resource advertises PAUSE",
+    "authority": "work-tasks:read UI guard + current series PAUSE capability + version; UI retains no automation state and server rechecks caller, state and concurrency"
+  },
+  "DELETE /api/v1/work/task-series/{seriesId}": {
+    "phase": "P5",
+    "surface": "Stop future Work task series occurrences only after the current resource advertises STOP",
+    "authority": "work-tasks:read UI guard + current series STOP capability + version; server preserves generated tasks and occurrence history and rechecks caller visibility"
+  },
+  "GET /api/v1/work/task-series/{seriesId}": {
+    "phase": "P5",
+    "surface": "Read one complete typed Work task series baseline only after navigating from an UPDATE-capable list item",
+    "authority": "work-tasks:read UI guard + server-confirmed series visibility + returned ID match; complete detail is used only for a full UPDATE replacement and never reconstructed from the list"
+  },
+  "PUT /api/v1/work/task-series/{seriesId}": {
+    "phase": "P5",
+    "surface": "Replace a Work task series from its current complete typed baseline when the resource advertises UPDATE",
+    "authority": "work-tasks:read UI guard + current series UPDATE capability + detail baseline version; member selections only use the visible server directory and server rechecks caller, recurrence, participants and concurrency"
+  },
+  "POST /api/v1/work/tasks": {
+    "surface": "Create a Work task with server-visible assignee and up to 50 unique followers, explicit title and non-empty description, an optional supported priority/due time, and an optional explicit supported business-record pair",
+    "authority": "work-tasks:read + work-tasks:write + organization:read UI guard + server-confirmed active assignee, followers, creator scope and business-record write visibility; UI accepts only LOW/NORMAL/HIGH/URGENT when a priority is explicitly selected, otherwise the server default applies; a business type and positive record ID must be supplied together, and UI sends no reminder"
+  },
+  "GET /api/v1/attachment-targets/{targetType}/{targetId}/attachments": {
+    "phase": "P5/P8",
+    "surface": "List published controlled attachments for one visible Work task, product, or marketing activity",
+    "authority": "files:read plus the target page's read UI guard; the server rechecks active membership, target visibility and attachment availability"
+  },
+  "GET /api/v1/attachment-targets/{targetType}/{targetId}/attachments/{fileId}": {
+    "phase": "P8",
+    "surface": "Read one controlled attachment metadata record from its visible target",
+    "authority": "files:read UI guard + server-confirmed target visibility; browser does not use metadata to infer upload or mutation authority"
+  },
+  "GET /api/v1/attachment-targets/{targetType}/{targetId}/attachments/{fileId}/content": {
+    "phase": "P5/P8",
+    "surface": "Download one listed controlled attachment through authenticated fetch and a short-lived Blob URL",
+    "authority": "files:read plus target read UI guard; server rechecks target visibility and attachment availability"
+  },
+  "GET /api/v1/attachment-targets/{targetType}/{targetId}/attachments/{fileId}/upload-status": {
+    "phase": "P5/P8",
+    "surface": "Read the immediate inspection status after a controlled attachment upload",
+    "authority": "files:write plus target write UI guard; server rechecks active membership, uploader and target mutation access"
+  },
+  "POST /api/v1/attachment-targets/{targetType}/{targetId}/attachments/upload-intents": {
+    "phase": "P5/P8",
+    "surface": "Create a one-shot controlled attachment upload intent for a visible Work task, product, or marketing activity",
+    "authority": "work-tasks:write, products:write or marketing-activities:write, plus files:write UI guards; server rechecks target mutation access and upload constraints"
+  },
+  "PUT /api/v1/attachment-targets/{targetType}/{targetId}/attachments/{fileId}/content": {
+    "phase": "P5/P8",
+    "surface": "Upload the selected controlled attachment bytes using the intent's file ID and version",
+    "authority": "work-tasks:write, products:write or marketing-activities:write, plus files:write UI guards; server rechecks uploader, target access, content transport and intent version"
+  },
+  "DELETE /api/v1/attachment-targets/{targetType}/{targetId}/attachments/{fileId}": {
+    "phase": "P5/P8",
+    "surface": "Withdraw a visible Work task, product, or marketing-activity attachment after explicit confirmation",
+    "authority": "work-tasks:write, products:write or marketing-activities:write, plus files:write UI guards; server rechecks target mutation access and current version"
+  },
+  "PUT /api/v1/work/tasks/{taskId}": {
+    "surface": "Manager-edit an open Work task from its complete versioned structure baseline",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage UI guard + returned open task ID/version; UI only sends title, description, priority and due time"
+  },
+  "PUT /api/v1/work/tasks/{taskId}/assignee": {
+    "surface": "Manager-reassign an open Work task to a server-visible active member using its narrow-projection version",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage + organization:read UI guards + task participant visibility + active assignee + current version; server also permits creators but the UI needs a reviewed caller capability"
+  },
+  "PUT /api/v1/work/tasks/{taskId}/followers": {
+    "surface": "Manager-replace an open Work task's complete follower baseline with up to 50 server-visible active members",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage + organization:read UI guards + complete follower baseline version + task participant visibility + unique active followers; server also permits creators but the UI needs a reviewed caller capability"
+  },
+  "PUT /api/v1/work/tasks/{taskId}/business-record": {
+    "surface": "Create, replace, or explicitly clear an open Work task business relation using a supported type and positive record ID",
+    "authority": "work-tasks:read + work-tasks:write UI guards + task participant visibility + returned open-task version; a replacement sends the explicit supported pair, while clear omits both fields; server rechecks caller active membership, target write visibility, task state and concurrency"
+  },
+  "POST /api/v1/work/tasks/{taskId}/cancel": {
+    "surface": "Manager-cancel an open Work task after explicit confirmation with its narrow-projection version",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage UI guards + task participant visibility + returned open-task version; server also permits creators but the UI needs a reviewed caller capability"
+  },
+  "DELETE /api/v1/work/tasks/{taskId}": {
+    "surface": "Manager-delete a never-started Work task after explicit confirmation with its narrow-projection version",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage UI guards + task participant visibility + TODO version; server also verifies no start, comments, or attachment history and permits creators pending caller capability"
+  },
+  "GET /api/v1/work/tasks/{taskId}/reminders": {
+    "surface": "Read the dedicated complete versioned reminder-plan baseline for one visible Work task",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage UI guards + task participant visibility; server also permits creators pending caller capability"
+  },
+  "PUT /api/v1/work/tasks/{taskId}/reminders": {
+    "surface": "Manager-replace a due open Work task reminder plan from its dedicated complete baseline",
+    "authority": "work-tasks:read + work-tasks:write + work-tasks:manage UI guards + complete reminder-plan version + task participant visibility + due time; server also permits creators pending caller capability"
+  },
+  "GET /api/v1/work/tasks/{taskId}": {
+    "surface": "Read one server-visible Work task through the same narrow browse projection",
+    "authority": "work-tasks:read + server-confirmed participant visibility + returned task ID match"
+  },
+  "POST /api/v1/work/tasks/{taskId}/start": {
+    "surface": "Start a visible todo Work task with its narrow-projection version",
+    "authority": "work-tasks:write + task visibility + server-confirmed current assignee + TODO status + current version"
+  },
+  "POST /api/v1/work/tasks/{taskId}/return-to-todo": {
+    "surface": "Return a visible in-progress Work task to todo with its narrow-projection version",
+    "authority": "work-tasks:write + task visibility + server-confirmed current assignee + IN_PROGRESS status + current version"
+  },
+  "POST /api/v1/work/tasks/{taskId}/complete": {
+    "surface": "Complete a visible open Work task with its narrow-projection version",
+    "authority": "work-tasks:write + task visibility + server-confirmed current assignee + open status + current version"
+  },
+  "GET /api/v1/work/tasks/{taskId}/comments": {
+    "surface": "Read the first server-visible Work task comment page through an author-free projection",
+    "authority": "work-tasks:read + server-confirmed task participant visibility + returned task ID match"
+  },
+  "POST /api/v1/work/tasks/{taskId}/comments": {
+    "surface": "Publish a plain-text comment to a visible Work task",
+    "authority": "work-tasks:write + server-confirmed task participant visibility + server-normalized non-blank content"
+  },
+  "PUT /api/v1/leads/{leadId}/star": {
+    "surface": "Set the caller's personal server-visible lead star"
+  },
+  "GET /api/v1/work/task-series/{seriesId}/reminders": {
+    "phase": "P5",
+    "surface": "Read a dedicated complete versioned future-reminder template for one visible Work task series",
+    "authority": "work-tasks:read UI guard + current series UPDATE capability + server-confirmed series visibility + returned series ID match; browser never derives creator status"
+  },
+  "PUT /api/v1/work/task-series/{seriesId}/reminders": {
+    "phase": "P5",
+    "surface": "Replace a future-reminder template only after the current series advertises UPDATE, using its dedicated baseline version",
+    "authority": "work-tasks:read UI guard + current series UPDATE capability + dedicated template version; UI sends only unique fixed steps and server rechecks caller"
+  },
+  "GET /api/v1/work/task-series/{seriesId}/occurrences": {
+    "phase": "P5",
+    "surface": "Page immutable occurrence facts for one server-visible Work task series",
+    "authority": "work-tasks:read UI guard + server-confirmed series visibility + returned series ID match; UI retains only sequence, resolved due time, and outcome status"
+  },
+  "GET /api/v1/authorization/capabilities": {
+    "phase": "P7",
+    "surface": "Read the server-defined tenant-assignable capability catalog before a role grant is created or replaced",
+    "authority": "authorization:read UI guard; Web submits only returned capability codes and never invents data scopes"
+  },
+  "GET /api/v1/authorization/roles": {
+    "phase": "P7",
+    "surface": "Page typed tenant roles with URL-recoverable keyword and pagination",
+    "authority": "authorization:read UI guard + active membership; write actions use only current server-returned role versions"
+  },
+  "POST /api/v1/authorization/roles": {
+    "phase": "P7",
+    "surface": "Create a custom role from server-listed capability codes",
+    "authority": "authorization:write + authorization:assign UI guards; server rechecks every grant is assignable"
+  },
+  "PUT /api/v1/authorization/roles/{roleId}": {
+    "phase": "P7",
+    "surface": "Version-update a custom role's name, description, and active state",
+    "authority": "authorization:write + authorization:assign UI guards + matching role version; server rechecks delegability and system-role protection"
+  },
+  "PUT /api/v1/authorization/roles/{roleId}/grants": {
+    "phase": "P7",
+    "surface": "Version-replace a custom role's grants while preserving only server-returned existing scopes",
+    "authority": "authorization:write + authorization:assign UI guards + matching role version; new grant codes come only from the capability catalog"
+  },
+  "POST /api/v1/authorization/roles/{roleId}/copy": {
+    "phase": "P7",
+    "surface": "Copy a role without assignments using an explicitly entered name",
+    "authority": "authorization:write + authorization:assign UI guards; server rechecks source delegability and copied grants"
+  },
+  "DELETE /api/v1/authorization/roles/{roleId}": {
+    "phase": "P7",
+    "surface": "Explicitly delete an unassigned custom role with its current version",
+    "authority": "authorization:write + authorization:assign UI guards + matching role version; server rejects system, non-delegable, or assigned roles"
+  },
+  "GET /api/v1/authorization/roles/{roleId}/assignments": {
+    "phase": "P7",
+    "surface": "Page explicit role assignments inside the selected role drawer",
+    "authority": "authorization:read UI guard + server-confirmed tenant role visibility; UI retains only actor ID and assignment time"
+  },
+  "POST /api/v1/authorization/roles/{roleId}/assignments": {
+    "phase": "P7",
+    "surface": "Assign a role to members selected only from the server-visible active member directory",
+    "authority": "authorization:assign + organization:read UI guards; server rechecks active membership, role delegability, tenant boundary, and duplicates"
+  },
+  "DELETE /api/v1/authorization/roles/{roleId}/assignments/{actorId}": {
+    "phase": "P7",
+    "surface": "Remove one explicit role assignment after confirmation",
+    "authority": "authorization:assign UI guard; server rechecks role delegability, active owner invariants, tenant boundary, and assignment existence"
+  },
+  "GET /api/v1/organization/membership-requests": {
+    "phase": "P7",
+    "surface": "Page membership requests for the caller's active tenant for explicit PENDING review actions",
+    "authority": "organization:write UI guard + current active tenant; server rechecks request ownership and state transition"
+  },
+  "GET /api/v1/navigation/preferences": {
+    "phase": "P7",
+    "surface": "Read the current member's versioned menu preference and authorized recovery candidate tree from the application header",
+    "authority": "navigation:read UI guard + active membership; candidate tree is server-authority-filtered before personal hiding, never inferred from the preference-applied navigation response or administration catalog"
+  },
+  "PUT /api/v1/navigation/preferences": {
+    "phase": "P7",
+    "surface": "Replace the current member's menu order and hidden codes from the complete server preference baseline",
+    "authority": "navigation:write UI guard + matching version; browser retains unknown baseline codes, omits an initial null version, and server rechecks every code and concurrency"
+  },
+  "GET /api/v1/embedded-pages/configuration-options": {
+    "phase": "P7",
+    "surface": "Read the server-defined embedded-page object, platform, and status catalog before administration filtering or editing",
+    "authority": "embedded-pages:read UI guard + active membership; browser never enumerates object types, platforms, or statuses locally"
+  },
+  "GET /api/v1/embedded-pages": {
+    "phase": "P7",
+    "surface": "Page embedded-page configurations with URL-recoverable object, platform, status, and pagination filters",
+    "authority": "embedded-pages:read UI guard + server-scoped tenant visibility; query values remain inputs, not authorization evidence"
+  },
+  "POST /api/v1/embedded-pages": {
+    "phase": "P7",
+    "surface": "Create an initially inactive embedded page from the server configuration catalog",
+    "authority": "embedded-pages:write UI guard + current server catalog; server rechecks URL template safety, tenancy, and initial state"
+  },
+  "PUT /api/v1/embedded-pages/{pageId}": {
+    "phase": "P7",
+    "surface": "Version-update an embedded page from its current server response",
+    "authority": "embedded-pages:write UI guard + matching version; server rechecks template safety and status transition"
+  },
+  "DELETE /api/v1/embedded-pages/{pageId}": {
+    "phase": "P7",
+    "surface": "Explicitly delete an inactive embedded page with its current version",
+    "authority": "embedded-pages:write UI guard + INACTIVE server response + matching version; server rechecks current state and concurrency"
+  },
+  "GET /api/v1/embedded-pages/objects/{objectType}/{recordId}": {
+    "phase": "P7",
+    "surface": "Render active server-authorized embedded pages in a visible record detail without browser template expansion",
+    "authority": "embedded-pages:read UI guard + server-confirmed record visibility; browser uses only returned URL with a restricted iframe sandbox"
+  },
+  "GET /api/v1/users": {
+    "phase": "P7",
+    "surface": "Page the current tenant's typed user directory with URL-recoverable username, email, status, and pagination filters",
+    "authority": "users:read UI guard; query values are server-scoped inputs, and the server rechecks tenant visibility"
+  },
+  "POST /api/v1/users": {
+    "phase": "P7",
+    "surface": "Create a tenant user from an explicitly entered initial password held only in the transient form, with its active member/profile baseline",
+    "authority": "users:write UI guard; server rechecks tenant boundary, validation, uniqueness, and atomically provisions the linked current-tenant membership"
+  },
+  "PUT /api/v1/users/{userId}/status": {
+    "phase": "P7",
+    "surface": "Change a visible user's status only to the generated ACTIVE, INACTIVE, or LOCKED value and synchronize linked member access",
+    "authority": "users:write UI guard; server rechecks visibility and the lifecycle transition, then updates linked membership/profile access"
+  },
+  "DELETE /api/v1/users/{userId}": {
+    "phase": "P7",
+    "surface": "Explicitly soft-delete one visible tenant user and close its linked member access",
+    "authority": "users:delete UI guard + confirmation; server rechecks visibility and deletion preconditions, then synchronizes linked membership/profile access"
+  },
+  "GET /api/v1/opportunities/{opportunityId}/editable-baseline": {
+    "phase": "P3",
+    "surface": "Read the complete safe opportunity replacement baseline before rendering the internal basic-edit form",
+    "authority": "opportunities:read + opportunities:write UI guards; editable business values may be used only when the server returns a complete unmasked writable baseline"
+  },
+  "GET /api/v1/opportunities/{opportunityId}/collaborators": {
+    "phase": "P3",
+    "surface": "Read the authoritative, complete opportunity collaborator replacement baseline before opening the management dialog",
+    "authority": "opportunities:assign owner-scope UI guard; response is the only source for collaborators, caller state, and the optimistic-lock version"
+  },
+  "PUT /api/v1/opportunities/{opportunityId}/collaborators": {
+    "phase": "P3",
+    "surface": "Replace an opportunity collaborator list from its exact server baseline",
+    "authority": "opportunities:assign + matching collaborator-baseline version; new members additionally require organization:read server directory confirmation"
+  },
+  "DELETE /api/v1/opportunities/{opportunityId}/collaborators/me": {
+    "phase": "P3",
+    "surface": "Explicitly request that the current caller exits opportunity collaboration",
+    "authority": "opportunities:write UI guard + current detail version; server, not the browser, confirms caller membership, owner state, scope, and concurrency"
+  },
+  "GET /api/v1/worklist": {
+    "phase": "P5",
+    "surface": "Render the current member's date-selected, cursor-paginated worklist; opaque cursors stay in identity-isolated query cache",
+    "authority": "worklist:read UI guard + active membership; server rechecks each source capability, field policy, data scope, and task participation"
+  },
+  "POST /api/v1/worklist/acknowledgements": {
+    "phase": "P5",
+    "surface": "Acknowledge one exact worklist fingerprint or, after an explicit confirmation, all current items in one returned category",
+    "authority": "worklist:read UI guard; browser sends only date plus server-issued fingerprints or a category, and server fully revalidates visibility before writing member-scoped acknowledgements"
+  },
+  "GET /api/v1/approvals/pending-count": {
+    "phase": "P5",
+    "surface": "Show the current member's server-authorized pending-approval badge beside the protected header action",
+    "authority": "approvals:read UI guard + active membership; response is narrowed to a non-negative safe count and is never polled"
+  },
+  "POST /api/v1/opportunities/summary": {
+    "phase": "P3",
+    "surface": "Render the server-calculated count and estimated amount for the active opportunity filters without summing browser list rows",
+    "authority": "opportunities:read UI guard; server rechecks data scope and unmasked estimated-amount field access, while the browser only retains a non-negative safe aggregate"
+  },
+  "GET /api/v1/leads/{leadId}/hierarchy": {
+    "phase": "P3",
+    "surface": "Read a bounded hierarchy projection to show only the current lead's server-visible parent and descendants",
+    "authority": "leads:read UI guard + server-scoped visibility; browser does not infer hidden nodes or relations"
+  },
+  "PUT /api/v1/leads/{leadId}/parent": {
+    "phase": "P3",
+    "surface": "Set or explicitly clear the current lead's parent from a server-visible candidate list",
+    "authority": "leads:write UI guard + current version; browser excludes only visible descendants, while server rechecks field access, visibility, cycle, capacity, and concurrency"
+  },
+  "PUT /api/v1/leads/{leadId}/state": {
+    "phase": "P3",
+    "surface": "Update a complete visible lead lock and deal-state pair from the detail modal",
+    "authority": "leads:write UI guard + complete unmasked current state + current version; browser accepts only OPEN or WON and server rechecks field access, lifecycle, scope, and concurrency"
+  },
+  "PUT /api/v1/contacts/{contactId}/state": {
+    "phase": "P3",
+    "surface": "Update a complete visible contact lock and deal-state pair from the detail modal",
+    "authority": "contacts:write UI guard + complete unmasked current state + current version; browser accepts only OPEN or WON and server rechecks field access, lifecycle, scope, and concurrency"
+  },
+  "GET /api/v1/leads/tags": {
+    "phase": "P3",
+    "surface": "Read the server-authorized unmasked lead-tag catalog before detail tag replacement",
+    "authority": "leads:read route guard + leads:write UI guard; the catalog response is the only browser evidence that the current identity may safely use the visible tag baseline"
+  },
+  "PUT /api/v1/leads/{leadId}/tags": {
+    "phase": "P3",
+    "surface": "Version-replace one visible lead's complete tag collection from its detail editor",
+    "authority": "leads:write UI guard + current version + successfully decoded unmasked tag catalog; server rechecks TAGS field access, lifecycle, scope, validation, and concurrency"
+  },
+  "GET /api/v1/contacts/tags": {
+    "phase": "P3",
+    "surface": "Read the server-authorized unmasked contact-tag catalog before detail tag replacement",
+    "authority": "contacts:read route guard + contacts:write UI guard; the catalog response is the only browser evidence that the current identity may safely use the visible tag baseline"
+  },
+  "PUT /api/v1/contacts/{contactId}/tags": {
+    "phase": "P3",
+    "surface": "Version-replace one visible contact's complete tag collection from its detail editor",
+    "authority": "contacts:write UI guard + current version + successfully decoded unmasked tag catalog; server rechecks TAGS field access, lifecycle, scope, validation, and concurrency"
+  },
+  "GET /api/v1/marketing-forms/{formId}": {
+    "phase": "P6",
+    "surface": "Reload the selected marketing-form Drawer from its server-authorized detail before showing fields, public link, lifecycle actions, or version",
+    "authority": "marketing-forms:read route guard + server-scoped form visibility; the list row only supplies the selected ID, while all action baselines come from the detail response"
+  },
+  "GET /api/v1/oa/forms/{formId}": {
+    "phase": "P6",
+    "surface": "Reload an OA-form detail before opening its editor or confirming versioned status and deletion actions",
+    "authority": "oa-forms:read route guard + server-scoped form visibility; list rows only provide a selected ID and never supply action status, fields, or version"
+  },
+  "GET /api/v1/oa/forms/available/{formId}": {
+    "phase": "P6",
+    "surface": "Reload a selected available OA form before rendering request fields, uploading files, previewing approval, or submitting its version",
+    "authority": "oa-forms:read + oa-requests:submit UI guards and server availability check; the available-list response supplies only the selection option, while the detail response controls the request baseline"
+  },
+  "POST /api/v1/reports/trends": {
+    "phase": "P6",
+    "surface": "Query a current-member trend for one generated metric, complete URL-recoverable date range, and generated trend granularity",
+    "authority": "reports:read UI guard + only generated metric/granularity enums and complete ordered ISO dates; server rechecks data scope and field policy while the browser only formats returned points"
+  },
+  "POST /api/v1/reports/rankings": {
+    "phase": "P6",
+    "surface": "Query a current-member owner ranking for the selected generated metric and complete URL-recoverable date range",
+    "authority": "reports:read UI guard + only generated metric enum and complete ordered ISO dates; server rechecks data scope and field policy while the browser only formats returned items"
+  },
+  "DELETE /api/v1/crm-import-drafts/{draftId}": {
+    "phase": "P3",
+    "surface": "Withdraw a private lead, contact, or product CSV import draft and its source attachment",
+    "authority": "leads:write, contacts:write, or products:write for the selected draft object, plus files:write; the server rechecks creator, membership, scope, version, and attachment ownership"
+  },
+  "GET /api/v1/crm-import-drafts/{draftId}/preview": {
+    "phase": "P3",
+    "surface": "Parse and validate a clean staged lead, contact, or product CSV without persisting rows",
+    "authority": "leads:write, contacts:write, or products:write for the selected draft object, plus files:write; the server rechecks creator, membership, scope, and source inspection status"
+  },
+  "GET /api/v1/crm-import-drafts/{draftId}/error-report": {
+    "phase": "P3",
+    "surface": "Download the active private CRM import's derived row-number and error-code report without source values",
+    "authority": "leads:write, contacts:write, or products:write for the selected draft object, plus files:write; the server rechecks creator, membership, scope, active source state, and derives a no-store report without source cells or filename"
+  },
+  "GET /api/v1/crm-import-drafts/templates/{objectType}": {
+    "phase": "P3",
+    "surface": "Get the server-defined CSV column template for the selected CRM object before a controlled import starts",
+    "authority": "leads:write, contacts:write, or products:write UI guard + active membership; template read does not require files:write because it neither creates a draft nor handles a source file"
+  },
+  "GET /api/v1/crm-import-drafts/history/{objectType}": {
+    "phase": "P3",
+    "surface": "List the current member's recent completed CSV import summaries for the selected CRM object inside the controlled import flow",
+    "authority": "leads:write, contacts:write, or products:write for the selected object; server rechecks active membership and constrains the page to the caller's own completed drafts without source files or failed-row data"
+  },
+  "POST /api/v1/crm-import-drafts": {
+    "phase": "P3",
+    "surface": "Create a private lead, contact, or product CSV import draft before controlled source upload",
+    "authority": "leads:write, contacts:write, or products:write for the selected object, plus files:write; the server fixes the draft tenant and creator from the caller"
+  },
+  "POST /api/v1/crm-import-drafts/{draftId}/confirm": {
+    "phase": "P3",
+    "surface": "Confirm a validated CRM CSV: leads and contacts are all-or-nothing, while repeated or existing product codes are skipped without overwrite",
+    "authority": "leads:write, contacts:write, or products:write for the selected draft object, plus files:write; the server rechecks scope, field policy, version, source state, and transaction outcome"
+  },
+  "POST /api/v1/receivable-plans/export/csv": {
+    "phase": "P4",
+    "surface": "导出当前回款计划筛选结果为受控 CSV Blob",
+    "authority": "receivable-plans:read + receivable-plans:export；浏览器仅转发已确认的关键词、负责人场景、客户/合同、保存方案或内存临时条件和固定字段 code，不发送身份、范围、页码、文件名或行数据；服务端重验字段未脱敏策略、关系可见性和读取/导出范围交集"
+  },
+  "GET /api/v1/authentication/session": {
+    "phase": "P0",
+    "surface": "在进入受保护工作区前读取 HttpOnly 浏览器会话并建立 CSRF Cookie",
+    "authority": "公开会话探测；服务端只接受签名 Cookie，重验用户状态、成员资格和租户"
+  },
+  "DELETE /api/v1/authentication/session": {
+    "phase": "P0",
+    "surface": "显式结束当前浏览器会话并清除会话与 CSRF Cookie",
+    "authority": "有效浏览器会话 + 同源双提交 CSRF；服务端不接受浏览器提供的身份或租户"
+  },
+  "POST /api/v1/authentication/password/login-options": {
+    "phase": "P0",
+    "surface": "验证指定租户内的账号密码，并返回短时可选择的已授权租户",
+    "authority": "公开预认证入口；服务端只按请求的精确租户查找、验证密码后返回活动成员资格"
+  },
+  "POST /api/v1/authentication/password/sessions": {
+    "phase": "P0",
+    "surface": "使用短时登录挑战选择一个已授权租户，并签发 HttpOnly 浏览器会话",
+    "authority": "公开预认证入口；服务端验证签名挑战、用户当前状态和目标活动成员资格"
+  },
+  "POST /api/v1/authentication/password/reset-requests": {
+    "phase": "P0",
+    "surface": "为指定租户内账号申请一次性找回密码邮件",
+    "authority": "公开恢复入口；服务端保持账号不存在时的通用响应，令牌仅以摘要存储并由 SMTP 适配器发送"
+  },
+  "POST /api/v1/authentication/password/reset-confirmations": {
+    "phase": "P0",
+    "surface": "消费一次性找回令牌设置新密码，并使既有浏览器会话失效",
+    "authority": "公开恢复入口；服务端锁定并验证未过期未使用令牌、密码策略和用户状态"
+  }
+}

@@ -1,0 +1,124 @@
+.panel {
+  height: 100%;
+  min-height: 248px;
+  overflow: hidden;
+  border-color: var(--app-border);
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+.panel::before {
+  display: block;
+  height: 3px;
+  background: #2668d9;
+  content: "";
+}
+
+.period {
+  margin-block: 0 12px !important;
+}
+
+.titleBar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.metricSelector {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--app-text-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.metricSelector :global(.ant-select) {
+  min-width: 132px;
+}
+
+.chartControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 8px;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  min-height: 198px;
+  overflow: visible;
+}
+
+.chartBaseline {
+  stroke: var(--app-border);
+  stroke-width: 1;
+}
+
+.chartGuide {
+  stroke: var(--app-border-subtle);
+  stroke-dasharray: 4 4;
+  stroke-width: 1;
+}
+
+.line {
+  stroke: #2668d9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.point {
+  fill: #fff;
+  stroke: #2668d9;
+  stroke-width: 3;
+}
+
+.bar {
+  fill: #2668d9;
+  opacity: 0.88;
+}
+
+.axisLabel {
+  fill: var(--app-text-muted);
+  font-size: 12px;
+}
+
+.chartData,
+.announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.panel :global(.ant-card-head) {
+  min-height: 48px;
+  border-block-end-color: var(--app-border-subtle);
+}
+
+.panel :global(.ant-card-body) {
+  padding: 16px;
+}
+
+@media (width <= 520px) {
+  .titleBar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .chartControls {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}

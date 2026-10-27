@@ -1,0 +1,119 @@
+.card {
+  position: relative;
+  height: 100%;
+  min-height: 144px;
+  overflow: hidden;
+  border-color: var(--app-border);
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+.card :global(.ant-card-body) {
+  padding: 14px 16px;
+}
+
+.card:hover,
+.card:has(.selectButton:focus-visible) {
+  border-color: #8eb0ed;
+  box-shadow: none;
+}
+
+.active {
+  border-color: #2668d9;
+  background: #2668d9;
+  color: #ffffff;
+}
+
+.active :global(.ant-typography),
+.active :global(.ant-statistic-content),
+.active :global(.ant-statistic-content-suffix) {
+  color: inherit;
+}
+
+.active .caption,
+.active .trendSummary,
+.active :global(.ant-typography.ant-typography-secondary) {
+  color: #dbe9ff !important;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.caption {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.metricRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trend {
+  width: min(42%, 112px);
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.sparkline {
+  display: block;
+  width: 100%;
+  height: 42px;
+  overflow: visible;
+}
+
+.sparkline path {
+  fill: none;
+  stroke: #2668d9;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.active .sparkline path {
+  stroke: #ffffff;
+}
+
+.emptySparkline {
+  display: block;
+  height: 2px;
+  margin-block-end: 20px;
+  background: #b8cdf4;
+}
+
+.active .emptySparkline {
+  background: #dbe9ff;
+}
+
+.selectButton {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  min-height: 100%;
+  cursor: pointer;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+}
+
+.selectButton:focus-visible {
+  outline: 2px solid #2668d9;
+  outline-offset: -3px;
+}
+
+.trendSummary {
+  text-align: end;
+}
