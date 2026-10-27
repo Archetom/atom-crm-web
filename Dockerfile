@@ -10,7 +10,7 @@ RUN corepack enable && pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.31-alpine
 
 COPY deploy/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/build/client /usr/share/nginx/html
