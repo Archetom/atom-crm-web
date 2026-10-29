@@ -347,3 +347,9 @@ CSV 导入记录只可经认证的 `GET /api/v1/crm-import-drafts/history/{objec
 本次使用 Node.js 24.12.0、pnpm 11.9.0 与冻结锁文件安装，在修复后运行 `pnpm audit --prod --audit-level=high`，返回 `No known vulnerabilities found`。该结果记录当时 npm 已公布的生产依赖公告检查；本次未进行完整业务安全审计。漏洞报告流程见根目录 [SECURITY.md](../SECURITY.md)。
 
 浏览器验收同步修正开发身份页的测试入口为 `/dev/session`，并显式预扫描客户端路由依赖，解决空缓存首次启动的 Vite `504 Outdated Optimize Dep`。该项属于开发环境和 CI 稳定性修复；WCAG 与浏览器运行时错误断言保持完整，认证和业务授权边界沿用既有实现。
+
+## 2026-10-29 框架升级与生产 CSP
+
+依赖升级到当前稳定版本并刷新传递依赖；严格 peer 检查迁移到 `pnpm-workspace.yaml`，TypeScript 7 原生应用编译器与 OpenAPI/lint 所需的 TypeScript 5.9 API 兼容包分开使用。完整依赖树审计返回 `No known vulnerabilities found`；该结果只反映检查时已公布的依赖公告。
+
+真实 Nginx 容器回归发现原有 `script-src 'self'` 会拦截 React Router 生成的内联启动脚本。构建现在仅对自身生成的静态 HTML 计算精确 SHA-256，生成带哈希 allowlist 的 Nginx 模板，并和对应静态文件一起打包；不接受请求参数或用户内容作为哈希来源，不引入静态 nonce、`unsafe-inline` 或 `unsafe-eval`。CI 通过 Chromium 验证应用正常启动、路由导航无运行时错误，同时确认未知内联脚本被 CSP 阻止。原有同源 API 代理、开发身份头清理和生产包检查继续执行。

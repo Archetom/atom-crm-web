@@ -18,8 +18,8 @@ The frontend and backend build and deploy independently, sharing an OpenAPI cont
 
 ### Requirements
 
-- Node.js 24.12.0, as specified in [`.node-version`](.node-version)
-- pnpm 11.9.0, matching [`package.json`](package.json)
+- Node.js 26.13.0, as specified in [`.node-version`](.node-version)
+- pnpm 12.16.1, matching [`package.json`](package.json)
 - MySQL and the backend running as described in the [backend README](https://github.com/Archetom/atom-crm/blob/main/README.en.md#quick-start)
 
 ### Start the frontend

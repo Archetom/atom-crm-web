@@ -1,18 +1,19 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24.12-alpine AS build
+FROM node:26.13.0-alpine AS build
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN corepack enable && pnpm install --frozen-lockfile
+RUN npm install --global "$(node -p 'require("./package.json").packageManager')" \
+    && pnpm install --frozen-lockfile
 
 COPY . .
 RUN pnpm build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.31.8-alpine
 
-COPY deploy/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build /app/build/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/build/client /usr/share/nginx/html
 
 # The official Nginx entrypoint substitutes this value into the configuration

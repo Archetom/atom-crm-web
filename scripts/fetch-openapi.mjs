@@ -15,7 +15,7 @@ try {
     signal: AbortSignal.timeout(20_000),
   });
 } catch (error) {
-  throw new Error(`Cannot reach OpenAPI endpoint ${endpoint}: ${error.message}`);
+  throw new Error(`Cannot reach OpenAPI endpoint ${endpoint}: ${error.message}`, { cause: error });
 }
 
 if (!response.ok) {
@@ -26,7 +26,9 @@ let document;
 try {
   document = await response.json();
 } catch (error) {
-  throw new Error(`OpenAPI endpoint ${endpoint} did not return JSON: ${error.message}`);
+  throw new Error(`OpenAPI endpoint ${endpoint} did not return JSON: ${error.message}`, {
+    cause: error,
+  });
 }
 
 if (typeof document?.openapi !== "string" || !document.openapi.startsWith("3.")) {

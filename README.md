@@ -18,8 +18,8 @@
 
 ### 环境要求
 
-- Node.js 24.12.0，版本见 [`.node-version`](.node-version)
-- pnpm 11.9.0，与 [`package.json`](package.json) 一致
+- Node.js 26.13.0，版本见 [`.node-version`](.node-version)
+- pnpm 12.16.1，与 [`package.json`](package.json) 一致
 - 按[后端 README](https://github.com/Archetom/atom-crm#快速开始)启动 MySQL 和后端服务
 
 ### 启动前端

@@ -6,7 +6,7 @@
 
 ## 开发环境
 
-使用 Node.js 24.12.0、pnpm 11.9.0，按 [README](README.md#快速开始) 安装锁定依赖并启动。首次 checkout 使用已提交的 API 契约；仅在后端契约变化时重新生成。`.env` 只用于本地配置，不能加入密钥或开发身份 ID；所有 `VITE_*` 值都应视为可公开的浏览器配置。
+使用 Node.js 26.13.0、pnpm 12.16.1，按 [README](README.md#快速开始) 安装锁定依赖并启动。首次 checkout 使用已提交的 API 契约；仅在后端契约变化时重新生成。`.env` 只用于本地配置，不能加入密钥或开发身份 ID；所有 `VITE_*` 值都应视为可公开的浏览器配置。
 
 先阅读 [AGENTS.md](AGENTS.md)、[架构](docs/architecture.md) 与 [安全记录](docs/security.md)。保持严格类型、feature 的公开入口、服务端授权与字段策略边界；不要手工修改 `src/api/generated`，也不要用前端状态推断租户、角色或权限。
 
