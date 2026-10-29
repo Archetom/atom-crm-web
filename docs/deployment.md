@@ -144,7 +144,9 @@ Work 任务和通知部署快照必须为 `POST /api/v1/work/tasks/query`、`GET
 
 直接运行依赖与开发工具按 npm `latest` 稳定标签升级并精确锁定（下述 TypeScript API 兼容依赖除外），包含 React 19.3.1、React Router 8.5.1、Ant Design 6.6.8、Vite 8.3.5、ESLint 10.13.0 与 Vitest 5.0.5；传递依赖同步更新到上游允许范围内的最新版本。Vite 8 使用 Rolldown/Oxc；上表的显式浏览器目标继续生效。React 渲染器独立分块，继续执行单个 JS 资产不超过 100 KiB gzip 的既有预算。生产容器使用 Nginx 1.31.8 Alpine 官方主线镜像。
 
-应用类型检查使用 `typescript-native` 别名安装的 TypeScript 7.0.2，并由 `pnpm typecheck` 显式调用，避免两个编译器的 `tsc` 命令覆盖彼此。TypeScript 7 暂无旧 JavaScript 编译器 API；`openapi-typescript@7.13.0` 的 peer 要求为 `^5.x`，`typescript-eslint@8.72.1` 为 `>=4.8.4 <6.1.0`，因此工具链的 `typescript` 保留两者共同支持的 5.9.3。待上游支持后再移除此兼容依赖，不关闭严格 peer 检查或手工修改生成类型。参见 [TypeScript 7 发布说明](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/)。
+应用类型检查使用 `typescript-native` 别名安装的 TypeScript 7.0.2，并由 `pnpm typecheck` 显式调用，避免两个编译器的 `tsc` 命令覆盖彼此。TypeScript 7 暂无旧 JavaScript 编译器 API，工具链的 `typescript` 使用 6.0.3 提供该 API；`typescript-eslint@8.72.1` 的兼容范围为 `>=4.8.4 <6.1.0`。参见 [TypeScript 7 发布说明](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/)。
+
+`openapi-typescript@7.13.0` 发布包的 TypeScript peer 范围仍为 `^5.x`，[上游 TypeScript 6 支持 PR](https://github.com/openapi-ts/openapi-typescript/pull/2818) 尚未发布。因此 `pnpm-workspace.yaml` 仅将 `openapi-typescript@7.13.0>typescript` 覆盖为精确的 `6.0.3`，保留全局严格 peer 检查。此组合已验证本仓库 OpenAPI 生成无漂移，并由 CI 持续检查完整质量流程；这是仓库维护的兼容配置，不代表上游已正式支持。升级生成器或兼容编译器时须重新验证，待生成器发布 TypeScript 6 支持后移除覆盖；不得手工修改生成类型。
 
 pnpm 的精确版本与严格 peer 设置位于 `pnpm-workspace.yaml`；pnpm 12 不再从 `.npmrc` 读取这些设置。新环境运行 `pnpm install --frozen-lockfile`，再执行格式、lint、类型、单测、构建、`bundle:check`、API 生成漂移和浏览器可访问性检查。完整业务 E2E 仍需下文约定的隔离后端与数据库；本次不改变后端及其数据库版本。
 

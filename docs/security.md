@@ -350,6 +350,6 @@ CSV 导入记录只可经认证的 `GET /api/v1/crm-import-drafts/history/{objec
 
 ## 2026-10-29 框架升级与生产 CSP
 
-依赖升级到当前稳定版本并刷新传递依赖；严格 peer 检查迁移到 `pnpm-workspace.yaml`，TypeScript 7 原生应用编译器与 OpenAPI/lint 所需的 TypeScript 5.9 API 兼容包分开使用。完整依赖树审计返回 `No known vulnerabilities found`；该结果只反映检查时已公布的依赖公告。
+依赖升级到当前稳定版本并刷新传递依赖；严格 peer 检查迁移到 `pnpm-workspace.yaml`，TypeScript 7 原生应用编译器与 OpenAPI/lint 所需的 TypeScript 6.0.3 API 兼容包分开使用。OpenAPI 生成器暂用精确限定到 `openapi-typescript@7.13.0>typescript: 6.0.3` 的 peer 覆盖，兼容验证与移除条件见 [部署文档](deployment.md#2026-10-29-依赖升级)；全局严格 peer 检查保持启用。完整依赖树审计返回 `No known vulnerabilities found`；该结果只反映检查时已公布的依赖公告。
 
 真实 Nginx 容器回归发现原有 `script-src 'self'` 会拦截 React Router 生成的内联启动脚本。构建现在仅对自身生成的静态 HTML 计算精确 SHA-256，生成带哈希 allowlist 的 Nginx 模板，并和对应静态文件一起打包；不接受请求参数或用户内容作为哈希来源，不引入静态 nonce、`unsafe-inline` 或 `unsafe-eval`。CI 通过 Chromium 验证应用正常启动、路由导航无运行时错误，同时确认未知内联脚本被 CSP 阻止。原有同源 API 代理、开发身份头清理和生产包检查继续执行。
