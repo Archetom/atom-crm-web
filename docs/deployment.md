@@ -138,11 +138,23 @@ Work 任务和通知部署快照必须为 `POST /api/v1/work/tasks/query`、`GET
 
 调整该矩阵时同时修改 `vite.config.ts` 的 `build.target` 与本表。仓库没有 browserslist 配置，`build.target` 是唯一来源。
 
-运行时要求 Node.js 24.12 或更高：`.node-version`、`package.json` 的 `engines`、CI 与 `Dockerfile` 保持一致。Node 22 已于 2025-10-21 转入 Maintenance LTS。
+构建与测试要求 Node.js 26.13.0 或更高、pnpm 12.16.1 或更高；仓库固定使用 `.node-version` 和 `package.json#packageManager` 中的版本，CI 直接读取这两个来源。Docker 构建使用同版本 Node Alpine 镜像，并从 `packageManager` 安装 pnpm；Node 26 不再随附 Corepack。
+
+### 2026-10-29 依赖升级
+
+直接运行依赖与开发工具按 npm `latest` 稳定标签升级并精确锁定（下述 TypeScript API 兼容依赖除外），包含 React 19.3.1、React Router 8.5.1、Ant Design 6.6.8、Vite 8.3.5、ESLint 10.13.0 与 Vitest 5.0.5；传递依赖同步更新到上游允许范围内的最新版本。Vite 8 使用 Rolldown/Oxc；上表的显式浏览器目标继续生效。React 渲染器独立分块，继续执行单个 JS 资产不超过 100 KiB gzip 的既有预算。生产容器使用 Nginx 1.31.8 Alpine 官方主线镜像。
+
+应用类型检查使用 `typescript-native` 别名安装的 TypeScript 7.0.2，并由 `pnpm typecheck` 显式调用，避免两个编译器的 `tsc` 命令覆盖彼此。TypeScript 7 暂无旧 JavaScript 编译器 API；`openapi-typescript@7.13.0` 的 peer 要求为 `^5.x`，`typescript-eslint@8.72.1` 为 `>=4.8.4 <6.1.0`，因此工具链的 `typescript` 保留两者共同支持的 5.9.3。待上游支持后再移除此兼容依赖，不关闭严格 peer 检查或手工修改生成类型。参见 [TypeScript 7 发布说明](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/)。
+
+pnpm 的精确版本与严格 peer 设置位于 `pnpm-workspace.yaml`；pnpm 12 不再从 `.npmrc` 读取这些设置。新环境运行 `pnpm install --frozen-lockfile`，再执行格式、lint、类型、单测、构建、`bundle:check`、API 生成漂移和浏览器可访问性检查。完整业务 E2E 仍需下文约定的隔离后端与数据库；本次不改变后端及其数据库版本。
 
 ## 生产静态部署与同源代理
 
 `Dockerfile` 构建的是不含开发身份的静态 SPA 镜像；运行时由 Nginx 将同源 `/api/` 转发给生产认证后的后端或网关。镜像不提供、存储或注入人员凭证，也会在代理层清空 `X-Dev-User-Id` 和 `X-Dev-Tenant-Id`。生产认证、Cookie 属性、SSO 回调、TLS 终止、限流和审计仍属于身份网关与后端的责任，不能通过 Web 容器模拟。
+
+`pnpm build` 根据本次 `build/client/index.html` 中的内联启动脚本生成精确 SHA-256 CSP allowlist，并输出 `build/nginx/default.conf.template`；Docker 将它与同一次构建的静态文件一起复制。不能直接部署含占位符的源模板，也不能混用不同构建的 HTML 与配置。`script-src` 只允许同源脚本及这些哈希，不启用 `unsafe-inline` 或 `unsafe-eval`。自行托管静态文件时，也需将生成配置中的 CSP 同步到网关。
+
+CI 构建并启动真实生产容器，然后运行 `pnpm test:e2e:production`，验证登录页 hydration、懒加载路由导航和 CSP 对未知内联脚本的拦截。该测试只模拟安装状态，不连接业务后端。默认目标为 `http://127.0.0.1:18089`，本地已启动其他端口的生产容器时可用 `ATOM_CRM_WEB_E2E_BASE_URL` 指定地址。
 
 ```bash
 docker build -t atom-crm-web:local .

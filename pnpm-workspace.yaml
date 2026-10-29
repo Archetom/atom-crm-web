@@ -1,3 +1,8 @@
 allowBuilds:
   esbuild: true
   msw: false
+saveExact: true
+strictPeerDependencies: true
+# Explicit latest-version upgrade; keep the release-age exception version-scoped.
+minimumReleaseAgeExclude:
+  - "@types/node@26.6.6"

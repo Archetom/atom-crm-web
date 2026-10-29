@@ -25,6 +25,20 @@ export default defineConfig(({ command, mode }) => {
       // would change the shipped support matrix without any change here.
       // Kept in sync with the matrix in docs/deployment.md.
       target: ["chrome107", "edge107", "firefox104", "safari16"],
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            // Keep the renderer separate from router and application code so
+            // Vite 8's shared chunks stay within the existing gzip budget.
+            groups: [
+              {
+                name: "react-vendor",
+                test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/,
+              },
+            ],
+          },
+        },
+      },
     },
     resolve: {
       alias: {

@@ -8,7 +8,7 @@ server {
   add_header X-Content-Type-Options "nosniff" always;
   add_header X-Frame-Options "SAMEORIGIN" always;
   add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-  add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
+  add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self' __ATOM_CRM_SCRIPT_HASHES__; style-src 'self' 'unsafe-inline'" always;
   # Nearby customer and lead pages explicitly request browser geolocation.
   add_header Permissions-Policy "geolocation=(self)" always;
 
@@ -17,7 +17,7 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self' __ATOM_CRM_SCRIPT_HASHES__; style-src 'self' 'unsafe-inline'" always;
     add_header Permissions-Policy "geolocation=(self)" always;
     try_files /index.html =404;
   }
@@ -29,7 +29,7 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src https:; img-src 'self' data: blob:; object-src 'none'; script-src 'self' __ATOM_CRM_SCRIPT_HASHES__; style-src 'self' 'unsafe-inline'" always;
     add_header Permissions-Policy "geolocation=(self)" always;
     try_files $uri =404;
   }
