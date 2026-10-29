@@ -53,8 +53,8 @@ jobs:
             -p 127.0.0.1:18089:8080 \
             -e ATOM_CRM_API_UPSTREAM=http://127.0.0.1:18080 atom-crm-web:ci
           trap 'docker stop atom-crm-web-production-test >/dev/null' EXIT
-          curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused \
-            http://127.0.0.1:18089/login >/dev/null
+          curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-all-errors \
+            --max-time 5 --retry-max-time 30 http://127.0.0.1:18089/login >/dev/null
           pnpm test:e2e:production
       - name: Preserve failed browser test reports
         if: failure()
