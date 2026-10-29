@@ -3,6 +3,11 @@ allowBuilds:
   msw: false
 saveExact: true
 strictPeerDependencies: true
+# Upstream TS 6 support: https://github.com/openapi-ts/openapi-typescript/pull/2818
+# Keep this scoped to the generator/compiler pair verified by api:check; remove
+# when a published generator declares TS 6 support, and revalidate on upgrades.
+overrides:
+  "openapi-typescript@7.13.0>typescript": "6.0.3"
 # Explicit latest-version upgrade; keep the release-age exception version-scoped.
 minimumReleaseAgeExclude:
   - "@types/node@26.6.6"
